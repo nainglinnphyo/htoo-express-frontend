@@ -14,6 +14,7 @@ import type {
 	handleStockAdjustPayload,
 	ProductDetailsResponse,
 	ProductResponse,
+	ProductVariationForScanResponse,
 	ProductVariationInvoiceResponse,
 	ProductVariationResponse,
 	ProductVariationSizeResponse,
@@ -325,3 +326,18 @@ export const useCreateInvoice = () => {
 		},
 	});
 };
+
+const getProductVariationForScan = async (code: string) => {
+	console.log("from api ", code);
+	const response = await axios.get(`product/variation/${code}`, {
+		headers: authJsonHeader(),
+	});
+	return response.data._data;
+};
+
+export const useGetProductVariationForScan = (code: string) =>
+	useQuery<ProductVariationForScanResponse>({
+		queryKey: [`product-variation-${code}`],
+		queryFn: () => getProductVariationForScan(code),
+		placeholderData: keepPreviousData,
+	});

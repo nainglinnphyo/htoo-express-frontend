@@ -120,3 +120,8 @@ export interface createInvoicePayload {
 		qty: number;
 	}[];
 }
+
+export interface ProductVariationForScanResponse {
+	data: ProductVariation[];
+	totalCount: number;
+}

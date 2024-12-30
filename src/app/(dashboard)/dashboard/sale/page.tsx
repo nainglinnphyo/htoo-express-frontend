@@ -23,6 +23,9 @@ import {
 	Modal,
 	Flex,
 	Stack,
+	Skeleton,
+	Loader,
+	LoadingOverlay,
 } from '@mantine/core'
 import { IconShoppingCart, IconPlus, IconUser, IconSearch } from '@tabler/icons-react'
 import { useCreateInvoice, useGetProductVariationForVoucher } from '@/services/products'
@@ -32,6 +35,7 @@ import { FormattedNumber } from '@/components/Text/NumberFormatter'
 import { AnimatePresence } from 'framer-motion'
 import { AnimatedPageTransition } from '@/components/Product/AnimatedPageTransition'
 import { AnimatedProductCard } from '@/components/Product/AnimatedProductCard'
+import ScanPage from '../scan/page'
 
 interface Product {
 	id: string
@@ -63,6 +67,11 @@ export default function SaleVoucherPage() {
 	const [formValue, setFormValue] = useState<any | null>(null);
 	const [totalTax, setTotalTax] = useState(0);
 
+	const playNotificationSound = () => {
+		const audio = new Audio('/scan.mp3');
+		audio.play()
+	};
+
 	const [debouncedSearchQuery] = useDebouncedValue(searchQuery, 300);
 
 	const { data, isLoading, refetch } = useGetProductVariationForVoucher({
@@ -90,6 +99,7 @@ export default function SaleVoucherPage() {
 
 	useEffect(() => {
 		updateProductsData();
+
 	}, [updateProductsData]);
 
 	useEffect(() => {
@@ -107,15 +117,18 @@ export default function SaleVoucherPage() {
 	})
 
 	const handleAddToVoucher = (product: Product) => {
-		const existingProduct = voucher.find((item) => item.id === product.id)
-		if (existingProduct) {
-			handleQuantityChange(product.id, (productQuantities[product.id] || 1) + 1)
+		const existingProductIndex = voucher.findIndex(item => item.id === product.id)
+
+		if (existingProductIndex !== -1) {
+			// If product exists, update its quantity
+			const newQuantity = (productQuantities[product.id] || 1) + 1
+			handleQuantityChange(product.id, newQuantity)
 		} else {
-			setVoucher((prev) => [...prev, product])
-			handleQuantityChange(product.id, 1)
+			// If product is new, add it to voucher with quantity 1
+			setVoucher(prev => [...prev, { ...product, qty: 1 }])
+			setProductQuantities(prev => ({ ...prev, [product.id]: 1 }))
 		}
 	}
-
 	const handleRemoveFromVoucher = (productId: string) => {
 		setVoucher((prev) => prev.filter((item) => item.id !== productId))
 		setProductQuantities((prev) => {
@@ -187,6 +200,60 @@ export default function SaleVoucherPage() {
 		setConfirmModalOpened(false);
 	}
 
+	const updateScanText = async (text: string) => {
+		try {
+			// Prevent processing empty codes
+			if (!text?.trim()) return;
+
+			const trimmedText = text.trim();
+
+			// Clear previous search to avoid duplicate search results
+			setSearchQuery('');
+
+			// Fetch product data
+			const result = await refetch();
+
+			if (!result.data?.data) return;
+
+			const scannedProduct = result.data.data.find(p => p.code === trimmedText);
+
+			if (scannedProduct) {
+				const product = {
+					id: scannedProduct.id || '',
+					code: scannedProduct.code,
+					category: `${scannedProduct.product?.brand?.name || ''} / ${scannedProduct.product?.category.name || ''} / ${scannedProduct.product?.subCategory.name || ''}`,
+					name: `${scannedProduct.product?.name || ''} / ${scannedProduct.size?.name || ''} / ${scannedProduct.color?.name || ''}`,
+					price: scannedProduct.sellingPrice || 0,
+				};
+
+
+				setVoucher(prevVoucher => {
+					const existingProductIndex = prevVoucher.findIndex(item => item.id === product.id);
+					if (existingProductIndex !== -1) {
+						// If product exists, update its quantity
+						const updatedVoucher = [...prevVoucher];
+						updatedVoucher[existingProductIndex] = {
+							...updatedVoucher[existingProductIndex],
+							qty: (updatedVoucher[existingProductIndex].qty || 0) + 1,
+						};
+						return updatedVoucher;
+					} else {
+						// If product is new, add it to voucher with quantity 1
+						return [...prevVoucher, { ...product, qty: 1 }];
+					}
+				});
+
+				setProductQuantities(prevQuantities => ({
+					...prevQuantities,
+					[product.id]: (prevQuantities[product.id] || 0) + 1,
+				}));
+				playNotificationSound()
+			}
+		} catch (error) {
+			console.error('Error processing scanned product:', error);
+		}
+	};
+
 	return (
 		<AnimatedPageTransition>
 			<Container size="xl" py="xl">
@@ -252,6 +319,12 @@ export default function SaleVoucherPage() {
 									</Grid.Col>
 								</Grid>
 							</Card>
+							<Card shadow="sm" p="md" radius="md" withBorder mb="md">
+								<Text fw={500} size="lg" mb="md">Barcode Scanner</Text>
+								<Group>
+									<ScanPage updateScanText={updateScanText} />
+								</Group>
+							</Card>
 							<Group mb="md">
 								<TextInput
 									leftSection={<IconSearch style={{ width: 18, height: 18 }} />}
@@ -277,7 +350,7 @@ export default function SaleVoucherPage() {
 											</tr>
 										</thead>
 										<tbody>
-											{productsData.map((product) => (
+											{isLoading ? <LoadingOverlay visible={true} /> : productsData.map((product) => (
 												<tr key={product.id}>
 													<td style={{ textAlign: 'center', padding: '1rem' }}>{product.code}</td>
 													<td style={{ textAlign: 'center', padding: '1rem' }}>{product.name}</td>
