@@ -75,7 +75,7 @@ export default function SaleVoucherPage() {
 		audio.play()
 	};
 
-	const [debouncedSearchQuery] = useDebouncedValue(searchQuery, 300);
+	const [debouncedSearchQuery] = useDebouncedValue(searchQuery, 200);
 
 	const { data, isLoading, refetch } = useGetProductVariationForVoucher({
 		pagination: {
@@ -328,7 +328,7 @@ export default function SaleVoucherPage() {
 									</Grid.Col>
 								</Grid>
 							</Card>
-							<Card shadow="sm" radius="md" withBorder>
+							<Card shadow="sm" radius="md" withBorder mb='md'>
 								<Text fw={500} size="lg">Barcode Scanner</Text>
 								<Group>
 									<ScanPage updateScanText={updateScanText} scannedProduct={currentScanProduct} />
@@ -480,7 +480,7 @@ export default function SaleVoucherPage() {
 					</Group>
 				</Modal>
 			</Container>
-		</AnimatedPageTransition>
+		</AnimatedPageTransition >
 	)
 }
 
