@@ -45,6 +45,7 @@ interface Product {
 	category: string
 	qty?: number
 	amount?: number
+	image: string[]
 }
 
 const formSchema = z.object({
@@ -66,6 +67,8 @@ export default function SaleVoucherPage() {
 	const [confirmModalOpened, setConfirmModalOpened] = useState(false);
 	const [formValue, setFormValue] = useState<any | null>(null);
 	const [totalTax, setTotalTax] = useState(0);
+
+	const [currentScanProduct, setCurrentScanProduct] = useState<Product | null>(null);
 
 	const playNotificationSound = () => {
 		const audio = new Audio('/scan.mp3');
@@ -91,7 +94,10 @@ export default function SaleVoucherPage() {
 				code: p.code,
 				category: `${p.product?.brand?.name || ''} / ${p.product?.category.name || ''} / ${p.product?.subCategory.name || ''}`,
 				name: `${p.product?.name || ''} / ${p.size?.name || ''} / ${p.color?.name || ''}`,
-				price: p.sellingPrice || 0
+				price: p.sellingPrice || 0,
+				image: p.image?.map((d) => {
+					return d.path
+				}) || []
 			}));
 			setProductsData(products)
 		}
@@ -202,20 +208,19 @@ export default function SaleVoucherPage() {
 
 	const updateScanText = async (text: string) => {
 		try {
-			// Prevent processing empty codes
+
 			if (!text?.trim()) return;
 
 			const trimmedText = text.trim();
 
-			// Clear previous search to avoid duplicate search results
 			setSearchQuery('');
 
-			// Fetch product data
 			const result = await refetch();
 
 			if (!result.data?.data) return;
 
 			const scannedProduct = result.data.data.find(p => p.code === trimmedText);
+			console.log({ scannedProduct })
 
 			if (scannedProduct) {
 				const product = {
@@ -224,8 +229,12 @@ export default function SaleVoucherPage() {
 					category: `${scannedProduct.product?.brand?.name || ''} / ${scannedProduct.product?.category.name || ''} / ${scannedProduct.product?.subCategory.name || ''}`,
 					name: `${scannedProduct.product?.name || ''} / ${scannedProduct.size?.name || ''} / ${scannedProduct.color?.name || ''}`,
 					price: scannedProduct.sellingPrice || 0,
+					image: scannedProduct.image?.map((d) => {
+						return d.path
+					}) || []
 				};
 
+				setCurrentScanProduct(product)
 
 				setVoucher(prevVoucher => {
 					const existingProductIndex = prevVoucher.findIndex(item => item.id === product.id);
@@ -319,10 +328,10 @@ export default function SaleVoucherPage() {
 									</Grid.Col>
 								</Grid>
 							</Card>
-							<Card shadow="sm" p="md" radius="md" withBorder mb="md">
-								<Text fw={500} size="lg" mb="md">Barcode Scanner</Text>
+							<Card shadow="sm" radius="md" withBorder>
+								<Text fw={500} size="lg">Barcode Scanner</Text>
 								<Group>
-									<ScanPage updateScanText={updateScanText} />
+									<ScanPage updateScanText={updateScanText} scannedProduct={currentScanProduct} />
 								</Group>
 							</Card>
 							<Group mb="md">
