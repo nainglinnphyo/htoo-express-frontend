@@ -1,2 +1,2 @@
-export const BACK_END_URL = "https://5f16-13-229-45-223.ngrok-free.app/api/v1/";
+export const BACK_END_URL = "https://htoo-express.buclib.club/api/v1/";
 // process.env.NEXT_PUBLIC_API_URL;
