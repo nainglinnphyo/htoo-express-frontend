@@ -34,7 +34,7 @@ export function VariationDetailsTable({ product, isProductLoading, sizeId }: { p
 		},
 
 	}, product?.id || '', sizeId);
-	const handleSearchChange = (e) => {
+	const handleSearchChange = (e: any) => {
 		const query = e.target.value;
 		setSearchQuery(query);
 	};
@@ -186,7 +186,7 @@ export function VariationDetailsTable({ product, isProductLoading, sizeId }: { p
 				onChange={handleSearchChange}
 				style={{ marginBottom: '20px' }}
 			/>
-			<StockAdjust opened={opened} close={close} currentRow={selectedRow} />
+			{selectedRow && <StockAdjust opened={opened} close={close} currentRow={selectedRow} />}
 			<MantineReactTable
 				table={table}
 			/>

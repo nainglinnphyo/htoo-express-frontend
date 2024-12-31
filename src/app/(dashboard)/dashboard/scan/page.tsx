@@ -4,12 +4,12 @@ import { Badge, Card, Group, Image, Paper, Stack, Text } from "@mantine/core"
 import React, { useCallback, useEffect, useRef } from "react"
 import BarcodeScannerComponent from "react-qr-barcode-scanner"
 
-interface ScanPageProps {
-	updateScanText: (text: string) => Promise<void>
-	scannedProduct: any
-}
+// interface ScanPageProps {
+// 	updateScanText: (text: string) => Promise<void>
+// 	scannedProduct: any
+// }
 
-export default function ScanPage({ updateScanText, scannedProduct }: ScanPageProps) {
+function ScanPage({ updateScanText, scannedProduct }: any) {
 	const [data, setData] = React.useState("Not Found")
 	const canScanRef = useRef(true)
 	const lastScannedRef = useRef("")
@@ -79,7 +79,7 @@ export default function ScanPage({ updateScanText, scannedProduct }: ScanPagePro
 					<Card shadow="sm" padding="lg" radius="md" withBorder className="mt-4">
 						<Card.Section display={'flex'}>
 							{scannedProduct.image.length > 0 ? (
-								scannedProduct.image.map((d) => {
+								scannedProduct.image.map((d: any) => {
 									return (
 										<Image
 											w={100}
@@ -109,3 +109,5 @@ export default function ScanPage({ updateScanText, scannedProduct }: ScanPagePro
 		</div>
 	)
 }
+
+export default ScanPage

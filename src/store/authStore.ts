@@ -1,3 +1,4 @@
+import { BACK_END_URL } from "@/utils";
 import { create } from "zustand";
 import { persist, createJSONStorage, devtools } from "zustand/middleware";
 
@@ -41,14 +42,11 @@ const useAuthStore = create<AuthState>()(
 				login: async ({ email, password }) => {
 					set({ isLoading: true });
 					try {
-						const response = await fetch(
-							`${process.env.NEXT_PUBLIC_API_URL}auth/login`,
-							{
-								method: "POST",
-								headers: { "Content-Type": "application/json" },
-								body: JSON.stringify({ email, password }),
-							}
-						);
+						const response = await fetch(`${BACK_END_URL}auth/login`, {
+							method: "POST",
+							headers: { "Content-Type": "application/json" },
+							body: JSON.stringify({ email, password }),
+						});
 						if (response.ok) {
 							const data = await response.json();
 							set({

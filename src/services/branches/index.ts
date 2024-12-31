@@ -15,7 +15,9 @@ import { toast } from "react-toastify";
 
 const getBranches = async ({ pagination, filters }: PaginationFilterProps) => {
 	const response = await axios.get(
-		`branch?page=${pagination.page}&size=${pagination.size}&search=${filters.search}`,
+		`branch?page=${pagination.page}&size=${pagination.size}&search=${
+			filters?.search || ""
+		}`,
 		{
 			headers: authJsonHeader(),
 		}
@@ -44,7 +46,7 @@ export const useCreateBranch = () => {
 				queryClient.invalidateQueries({ queryKey: ["branches"] });
 			}
 		},
-		onError: (e: unknown) => {
+		onError: (e: any) => {
 			toast.error(e.response.data._metadata.message, {
 				position: "bottom-right",
 			});

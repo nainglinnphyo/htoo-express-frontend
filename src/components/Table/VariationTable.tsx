@@ -33,7 +33,7 @@ export function VariationTable({ product, isProductLoading }: { product?: Produc
 
 	}, product?.id || '');
 
-	const handleSearchChange = (e) => {
+	const handleSearchChange = (e: any) => {
 		const query = e.target.value;
 		setSearchQuery(query);
 	};

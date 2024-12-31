@@ -36,9 +36,12 @@ export function StockAdjust({ opened, close, currentRow }: ProductModelProps) {
 	const handleStockAdjust = useHandleStockAdjust();
 
 	const onSubmit = (data: StockAdjustForm) => {
+		if (!currentRow) {
+			return
+		}
 		handleStockAdjust.mutate(
 			{
-				productVariationId: currentRow.id || "",
+				productVariationId: currentRow?.id || "",
 				...data,
 			},
 			{

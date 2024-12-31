@@ -82,11 +82,9 @@ export function SubCategoryTable() {
 			{/* Manual Pagination Control */}
 
 			<Pagination
-				page={pagination.pageIndex + 1} // 1-based index for Mantine Pagination
 				onChange={(page) => setPagination({ ...pagination, pageIndex: page - 1 })}
 				total={pageCount}
 				withEdges
-				position="center"
 			/>
 		</Paper>
 	);
