@@ -265,13 +265,65 @@ export default function SaleVoucherPage() {
 
 	return (
 		<AnimatedPageTransition>
-			<Container size="xl" py="xl">
-				<Title order={2} mb="lg">
-					Sale Voucher
-				</Title>
+			<Container size="xl">
 				<form onSubmit={handleSubmit(onSubmit)}>
 					<Grid>
 						<Grid.Col span={{ base: 12, md: 8 }}>
+							<Card shadow="sm" radius="md" withBorder mb='md'>
+								<Text fw={500} size="lg">Barcode Scanner</Text>
+								<Group>
+									<ScanPage updateScanText={updateScanText} scannedProduct={currentScanProduct} />
+								</Group>
+							</Card>
+							<Group mb="md">
+								<TextInput
+									leftSection={<IconSearch style={{ width: 18, height: 18 }} />}
+									placeholder="Search for a product"
+									value={searchQuery}
+									onChange={(e) => setSearchQuery(e.target.value)}
+									style={{ flexGrow: 1 }}
+								/>
+							</Group>
+							<Card shadow="sm" p="xs" radius="md" withBorder mb={'md'}>
+								<Text fw={500} size="lg" mb="sm">
+									Available Products
+								</Text>
+								<ScrollArea h={400}>
+									<Table striped highlightOnHover>
+										<thead>
+											<tr>
+												<th>Code</th>
+												<th>Name</th>
+												<th>Category</th>
+												<th style={{ textAlign: 'right' }}>Price</th>
+												<th style={{ textAlign: 'center' }}>Actions</th>
+											</tr>
+										</thead>
+										<tbody>
+											{isLoading ? <LoadingOverlay visible={true} /> : productsData.map((product) => (
+												<tr key={product.id}>
+													<td style={{ textAlign: 'center', padding: '1rem' }}>{product.code}</td>
+													<td style={{ textAlign: 'center', padding: '1rem' }}>{product.name}</td>
+													<td style={{ textAlign: 'center', padding: '1rem' }}>{product.category}</td>
+													<td style={{ textAlign: 'right', padding: '1rem' }}>
+														<Flex justify="flex-end" align="center">
+															<Text size="sm" mr={4}>Ks</Text>
+															<FormattedNumber value={Number(product.price.toFixed(2))} fw={600} />
+														</Flex>
+													</td>
+													<td style={{ textAlign: 'center', padding: '1rem' }}>
+														<Tooltip label="Add to Voucher">
+															<ActionIcon color="blue" onClick={() => handleAddToVoucher(product)}>
+																<IconPlus size={16} />
+															</ActionIcon>
+														</Tooltip>
+													</td>
+												</tr>
+											))}
+										</tbody>
+									</Table>
+								</ScrollArea>
+							</Card>
 							<Card shadow="sm" p="md" radius="md" withBorder mb="md">
 								<Group mb="md">
 									<Text fw={500} size="lg">
@@ -327,61 +379,6 @@ export default function SaleVoucherPage() {
 										/>
 									</Grid.Col>
 								</Grid>
-							</Card>
-							<Card shadow="sm" radius="md" withBorder mb='md'>
-								<Text fw={500} size="lg">Barcode Scanner</Text>
-								<Group>
-									<ScanPage updateScanText={updateScanText} scannedProduct={currentScanProduct} />
-								</Group>
-							</Card>
-							<Group mb="md">
-								<TextInput
-									leftSection={<IconSearch style={{ width: 18, height: 18 }} />}
-									placeholder="Search for a product"
-									value={searchQuery}
-									onChange={(e) => setSearchQuery(e.target.value)}
-									style={{ flexGrow: 1 }}
-								/>
-							</Group>
-							<Card shadow="sm" p="xs" radius="md" withBorder>
-								<Text fw={500} size="lg" mb="sm">
-									Available Products
-								</Text>
-								<ScrollArea h={400}>
-									<Table striped highlightOnHover>
-										<thead>
-											<tr>
-												<th>Code</th>
-												<th>Name</th>
-												<th>Category</th>
-												<th style={{ textAlign: 'right' }}>Price</th>
-												<th style={{ textAlign: 'center' }}>Actions</th>
-											</tr>
-										</thead>
-										<tbody>
-											{isLoading ? <LoadingOverlay visible={true} /> : productsData.map((product) => (
-												<tr key={product.id}>
-													<td style={{ textAlign: 'center', padding: '1rem' }}>{product.code}</td>
-													<td style={{ textAlign: 'center', padding: '1rem' }}>{product.name}</td>
-													<td style={{ textAlign: 'center', padding: '1rem' }}>{product.category}</td>
-													<td style={{ textAlign: 'right', padding: '1rem' }}>
-														<Flex justify="flex-end" align="center">
-															<Text size="sm" mr={4}>Ks</Text>
-															<FormattedNumber value={Number(product.price.toFixed(2))} fw={600} />
-														</Flex>
-													</td>
-													<td style={{ textAlign: 'center', padding: '1rem' }}>
-														<Tooltip label="Add to Voucher">
-															<ActionIcon color="blue" onClick={() => handleAddToVoucher(product)}>
-																<IconPlus size={16} />
-															</ActionIcon>
-														</Tooltip>
-													</td>
-												</tr>
-											))}
-										</tbody>
-									</Table>
-								</ScrollArea>
 							</Card>
 						</Grid.Col>
 
