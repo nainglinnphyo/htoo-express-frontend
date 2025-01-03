@@ -1,160 +1,20 @@
 'use client'
 
-
 import { useState } from 'react'
-import { Button, TextInput, Stack, Title, Accordion, Box, Tabs } from '@mantine/core'
+import { Button, TextInput, Stack, Title, Accordion, Box, Tabs, Switch } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import PermissionSelect from './PermissionSelect'
 import TablePermissions from './TablePermissions'
 import { useCreateRole } from '@/services/role'
 import { useRouter } from 'next/navigation'
-
-const resources = [
-	{
-		resource: "product",
-		tab: [
-			{
-				name: "product-list",
-				action: ["list", "create", "add-variation", "variation-details", "adjust-stock"]
-			}
-		],
-		table: [
-			{
-				name: "product-list-table",
-				column: ["code", "name", "description", "brand", "category", "sub-category", "variation-count", "action"]
-			},
-			{
-				name: "variation-list-table",
-				column: ["name", "variation-count", "stock", "action"]
-			},
-			{
-				name: "variation-details-table",
-				column: ["color", "selling-price", "stock", "image", "action"]
-			}
-		]
-	},
-	{
-		resource: "category",
-		tab: [
-			{
-				name: "category-list",
-				action: ["list", "create"]
-			}
-		],
-		table: [
-			{
-				name: "category-list-table",
-				column: ["name", "description", "subCategoryCount", "action"]
-			}
-		]
-	},
-	{
-		resource: "sub-category",
-		tab: [
-			{
-				name: "sub-category-list",
-				action: ["list", "create"]
-			}
-		],
-		table: [
-			{
-				name: "category-list-table",
-				column: ["name", "description", "subCategoryCount", "action"]
-			}
-		]
-	},
-	{
-		resource: "branch",
-		tab: [
-			{
-				name: "branch-list",
-				action: ["list", "create"]
-			}
-		],
-		table: [
-			{
-				name: "branch-list-table",
-				column: ["name", "address", "contactPerson", "contactPhone", "action"]
-			}
-		]
-	},
-	{
-		resource: "customer",
-		tab: [
-			{
-				name: "customer-list",
-				action: ["list", "create"]
-			}
-		],
-		table: [
-			{
-				name: "category-list-table",
-				column: ["name", "phone", "address", "action"]
-			}
-		]
-	},
-	{
-		resource: "sale",
-		tab: [
-			{
-				name: "sale-list",
-				action: ["create"]
-			}
-		],
-		table: []
-	},
-	{
-		resource: "invoice",
-		tab: [
-			{
-				name: "invoice-list",
-				action: ["create"]
-			}
-		],
-		table: [
-			{
-				name: "invoice-list-table",
-				column: ["invoice-no", "customer", "total-price", "tax", "invoice-by", "product-count", "action"]
-			}
-		]
-	},
-	{
-		resource: "user",
-		tab: [
-			{
-				name: "user-list",
-				action: ["create"]
-			}
-		],
-		table: [
-			{
-				name: "user-list-table",
-				column: ["name", "email", "password", "action"]
-			}
-		]
-	},
-	{
-		resource: "role",
-		tab: [
-			{
-				name: "role-list",
-				action: ["create"]
-			}
-		],
-		table: [
-			{
-				name: "role-list-table",
-				column: []
-			}
-		]
-	}
-]
+import resources from 'role.json'
 
 export default function RoleCreationForm() {
 	const router = useRouter()
 	const [permissions, setPermissions] = useState<any>({})
 	const [activeTab, setActiveTab] = useState<string | null>("product")
 	const [loading, setLoading] = useState<boolean>(false)
+	const [toggleStates, setToggleStates] = useState<{ [key: string]: boolean }>({})
 
 	const form = useForm({
 		initialValues: {
@@ -169,17 +29,16 @@ export default function RoleCreationForm() {
 	const handleSubmit = async (values: any) => {
 		setLoading(true);
 		try {
-			const permissionResource:
-				{
-					resource: string,
-					tabs: { name: string; action: string[] }[],
-					tables: { name: string; columns: string[] }[]
+			const permissionResource: {
+				resource: string,
+				tabs: { name: string; action: string[] }[],
+				tables: { name: string; columns: string[] }[]
+			}[] = []
 
-				}[] = []
 			Object.keys(permissions).forEach(key => {
 				const tabs: { name: string; action: string[] }[] = [];
 
-				permissions[key].tabs && Object.keys(permissions[key].actions).forEach(k => {
+				permissions[key].actions && Object.keys(permissions[key].actions).forEach(k => {
 					tabs.push({
 						name: k,
 						action: permissions[key].actions[k]
@@ -199,11 +58,12 @@ export default function RoleCreationForm() {
 					tables: tables
 				})
 			})
+
 			const payload = {
 				name: values.roleName,
 				permissionResource: permissionResource
 			}
-
+			console.log(payload)
 			await createRole.mutateAsync({
 				...payload
 			});
@@ -217,7 +77,7 @@ export default function RoleCreationForm() {
 		}
 	}
 
-	const handlePermissionChange = (resource: any, type: any, name: any, value: any) => {
+	const handlePermissionChange = (resource: string, type: string, name: string, value: any) => {
 		setPermissions((prev: { [x: string]: { [x: string]: any } }) => ({
 			...prev,
 			[resource]: {
@@ -228,6 +88,24 @@ export default function RoleCreationForm() {
 				}
 			}
 		}))
+	}
+
+	const toggleAllPermissions = (resource: string) => {
+		const newToggleState = !toggleStates[resource]
+		setToggleStates(prev => ({ ...prev, [resource]: newToggleState }))
+
+		const resourceData = resources.find(r => r.resource === resource)
+		if (!resourceData) return
+
+		// Toggle all tab actions
+		resourceData.tab.forEach(tab => {
+			handlePermissionChange(resource, 'actions', tab.name, newToggleState ? tab.action : [])
+		})
+
+		// Toggle all table columns
+		resourceData.table.forEach(table => {
+			handlePermissionChange(resource, 'tables', table.name, newToggleState ? table.column : [])
+		})
 	}
 
 	return (
@@ -252,7 +130,14 @@ export default function RoleCreationForm() {
 
 					{resources.map((resource) => (
 						<Tabs.Panel key={resource.resource} value={resource.resource}>
-							<Accordion variant="contained" mt="md">
+							<Box mt="md" mb="md">
+								<Switch
+									label={`Toggle All ${resource.resource.charAt(0).toUpperCase() + resource.resource.slice(1)} Permissions`}
+									checked={toggleStates[resource.resource] || false}
+									onChange={() => toggleAllPermissions(resource.resource)}
+								/>
+							</Box>
+							<Accordion variant="contained">
 								{resource.tab.map((tab) => (
 									<Accordion.Item key={tab.name} value={`${resource.resource}-${tab.name}-actions`}>
 										<Accordion.Control>
@@ -263,6 +148,7 @@ export default function RoleCreationForm() {
 												label={`${tab.name} Actions`}
 												data={tab.action}
 												onChange={(value) => handlePermissionChange(resource.resource, 'actions', tab.name, value)}
+												value={permissions[resource.resource]?.actions?.[tab.name] || []}
 											/>
 										</Accordion.Panel>
 									</Accordion.Item>
@@ -278,6 +164,7 @@ export default function RoleCreationForm() {
 												tableName={table.name}
 												columns={table.column}
 												onChange={(value) => handlePermissionChange(resource.resource, 'tables', table.name, value)}
+												value={permissions[resource.resource]?.tables?.[table.name] || []}
 											/>
 										</Accordion.Panel>
 									</Accordion.Item>
@@ -291,6 +178,7 @@ export default function RoleCreationForm() {
 					<Button loading={loading} type="submit" size="md">Create Role</Button>
 				</Box>
 			</Stack>
-		</form >
+		</form>
 	)
 }
+

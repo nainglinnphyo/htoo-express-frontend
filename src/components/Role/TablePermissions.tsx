@@ -1,38 +1,31 @@
-'use client'
-
-import { Checkbox, Stack, Text } from '@mantine/core'
-import { useState } from 'react'
+import { Checkbox } from '@mantine/core'
 
 interface TablePermissionsProps {
-	tableName: string
-	columns: string[]
-	onChange: (value: string[]) => void
+	tableName: string;
+	columns: string[];
+	onChange: (value: string[]) => void;
+	value: string[]; // Add this line
 }
 
-export default function TablePermissions({ tableName, columns, onChange }: TablePermissionsProps) {
-	const [selectedColumns, setSelectedColumns] = useState<string[]>([])
-
+export default function TablePermissions({ tableName, columns, onChange, value }: TablePermissionsProps) {
 	const handleChange = (column: string, checked: boolean) => {
-		const updatedColumns = checked
-			? [...selectedColumns, column]
-			: selectedColumns.filter(c => c !== column)
-		setSelectedColumns(updatedColumns)
-		onChange(updatedColumns)
-	}
+		const newValue = checked
+			? [...value, column]
+			: value.filter(c => c !== column);
+		onChange(newValue);
+	};
 
 	return (
-		<Stack>
-			<Text>{tableName} Columns</Text>
+		<div>
 			{columns.map(column => (
 				<Checkbox
 					key={column}
 					label={column}
-					checked={selectedColumns.includes(column)}
+					checked={value.includes(column)}
 					onChange={(event) => handleChange(column, event.currentTarget.checked)}
 				/>
 			))}
-		</Stack>
+		</div>
 	)
 }
-
 

@@ -1,30 +1,20 @@
-import { MultiSelect, Text } from '@mantine/core'
+import { MultiSelect } from '@mantine/core'
 
 interface PermissionSelectProps {
-	label: string
-	data: string[]
-	onChange: (value: string[]) => void
+	label: string;
+	data: string[];
+	onChange: (value: string[]) => void;
+	value: string[]; // Add this line
 }
 
-export default function PermissionSelect({ label, data, onChange }: PermissionSelectProps) {
+export default function PermissionSelect({ label, data, onChange, value }: PermissionSelectProps) {
 	return (
 		<MultiSelect
-			label={<Text>{label}</Text>}
-			data={data.map(item => ({ value: item, label: item }))}
-			placeholder="Select permissions"
-			searchable
-			clearable
+			label={label}
+			data={data}
 			onChange={onChange}
-			style={(theme) => ({
-				item: {
-					'&[data-selected]': {
-						'&, &:hover': {
-							backgroundColor: theme.colors.blue[2],
-							color: theme.colors.blue[9],
-						},
-					},
-				},
-			})}
+			value={value} // Add this line
+			placeholder="Select permissions"
 		/>
 	)
 }

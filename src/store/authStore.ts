@@ -1,4 +1,5 @@
 import { BACK_END_URL } from "@/utils";
+import axios from "axios";
 import { create } from "zustand";
 import { persist, createJSONStorage, devtools } from "zustand/middleware";
 
@@ -6,6 +7,13 @@ interface User {
 	id: string;
 	name: string;
 	email: string;
+	role?: Role;
+}
+
+interface Role {
+	name: string;
+	tabsPermission: any;
+	tablesPermission: any;
 }
 
 interface AuthState {
@@ -84,12 +92,12 @@ const useAuthStore = create<AuthState>()(
 				fetchUser: async () => {
 					set({ isLoading: true });
 					try {
-						// const response = await fetch("/api/me", {
-						//   credentials: "include",
-						//   headers: {
-						//     Authorization: `Bearer ${get().token}`,
-						//   },
-						// });
+						const response = await axios.get(`${BACK_END_URL}auth/me`, {
+							headers: {
+								Authorization: `Bearer ${get().token}`,
+							},
+						});
+
 						const authState = JSON.parse(
 							localStorage.getItem("auth-storage") || "{}"
 						);
@@ -97,19 +105,41 @@ const useAuthStore = create<AuthState>()(
 							throw new Error("No token found");
 						}
 
-						set({
-							user: { name: "admin", email: "admin", id: "1" },
-							token: authState.state.token,
-						});
-						// if (response.ok) {
-						//   const data = await response.json();
-						//   set({ user: data });
-						// } else {
-						//   throw new Error("Failed to fetch user");
-						// }
+						if (response.data) {
+							const data = await response.data;
+							// console.log(data._data.user.userRole.roleOnPermission);
+							set({
+								user: {
+									email: data._data.user.email,
+									id: data._data.user.id,
+									name: data._data.user.email,
+									role: {
+										name: data._data.user.userRole.name,
+										tablesPermission:
+											data._data.user.userRole.roleOnPermission.map(
+												(d: any) => {
+													return {
+														tableName: d.permissionResource.permissionColumn,
+													};
+												}
+											),
+										tabsPermission:
+											data._data.user.userRole.roleOnPermission.map(
+												(d: any) => {
+													return {
+														tabName: d.permissionResource.permissionTab,
+													};
+												}
+											),
+									},
+								},
+							});
+						} else {
+							throw new Error("Failed to fetch user");
+						}
 					} catch (error) {
 						console.error("Error fetching user:", error);
-						await get().logout();
+						// await get().logout();
 					} finally {
 						set({ isLoading: false });
 					}

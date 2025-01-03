@@ -13,6 +13,7 @@ interface Props {
 }
 
 export function Navbar({ data }: Props) {
+
 	const links = data.map((item) => (
 		<NavLinksGroup key={item.label} {...item} />
 	));

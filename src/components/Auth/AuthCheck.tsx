@@ -13,7 +13,7 @@ interface AuthCheckProps {
 
 export function AuthCheck({ children, redirectTo, shouldBeAuthenticated }: AuthCheckProps) {
 	const router = useRouter()
-	const { isAuthenticated, isLoading, fetchUser, hasStoredToken } = useAuthStore()
+	const { isAuthenticated, isLoading, fetchUser, hasStoredToken, user } = useAuthStore()
 	const [isChecking, setIsChecking] = useState(true)
 
 	useEffect(() => {
@@ -24,17 +24,15 @@ export function AuthCheck({ children, redirectTo, shouldBeAuthenticated }: AuthC
 
 			if (shouldBeAuthenticated !== isAuthenticated()) {
 				router.push(redirectTo)
-			} else {
-				setIsChecking(false)
 			}
+			setIsChecking(false)
 		}
 
 		checkAuth()
-	}, [isAuthenticated, isLoading, fetchUser, hasStoredToken, router, shouldBeAuthenticated, redirectTo])
+	}, [isAuthenticated, fetchUser, hasStoredToken, router, shouldBeAuthenticated, redirectTo])
 	if (isChecking) {
 		return <LoadingOverlay visible={true} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} />
 	}
-
 	return <>{children}</>
 }
 

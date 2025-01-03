@@ -5,7 +5,7 @@ import { UserListResponse } from "./types";
 
 const getUserList = async ({ pagination, filters }: PaginationFilterProps) => {
 	const response = await axios.get(
-		`user?page=${pagination.page}&size=${pagination.size}&search=${filters?.search}`,
+		`auth/users?page=${pagination.page}&size=${pagination.size}&search=${filters?.search}`,
 		{
 			headers: authJsonHeader(),
 		}
@@ -18,7 +18,7 @@ export const useGetUserList = ({
 	filters,
 }: PaginationFilterProps) =>
 	useQuery<UserListResponse>({
-		queryKey: ["brand"],
+		queryKey: ["user"],
 		queryFn: () => getUserList({ pagination, filters }),
 		placeholderData: keepPreviousData,
 	});

@@ -1,5 +1,15 @@
 [
 	{
+		"resource": "dashboard",
+		"tab": [
+			{
+				"name": "dashboard-list",
+				"action": ["list"]
+			}
+		],
+		"table": []
+	},
+	{
 		"resource": "product",
 		"tab": [
 			{
