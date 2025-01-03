@@ -220,7 +220,6 @@ export default function SaleVoucherPage() {
 			if (!result.data?.data) return;
 
 			const scannedProduct = result.data.data.find(p => p.code === trimmedText);
-			console.log({ scannedProduct })
 
 			if (scannedProduct) {
 				const product = {

@@ -102,9 +102,9 @@ export function ProductTable() {
 		positionActionsColumn: 'last',
 		renderRowActionMenuItems: ({ row }) => (
 			<>
-				<Menu.Item onClick={() => console.info(row)}>
+				<Menu.Item onClick={() => router.push(`/dashboard/product/variation/add?productId=${row.original.id}`)}>
 					Add Variation
-				</Menu.Item>
+				</Menu.Item >
 				<Menu.Item onClick={() => router.push(`/dashboard/product/variation?id=${row.original.id}`)}>Variation</Menu.Item >
 			</>
 		),

@@ -1,13 +1,13 @@
 "use client";
 
-import { Paper, Title, Space, Pagination, Select, TextInput } from "@mantine/core";
+import { Paper, Title, Space, Pagination, Select, TextInput, Text } from "@mantine/core";
 import { MantineReactTable, type MRT_ColumnDef } from "mantine-react-table";
 import { useEffect, useMemo, useState } from "react";
 import { useDebouncedValue } from "@mantine/hooks";
-import { useCategory } from "@/services/categories";
-import { Category } from "@/services/categories/types";
+import { useGetRoleList } from "@/services/role";
+import { Role } from "@/services/role/types";
 
-export function CategoryTable() {
+export function RoleTable() {
 	const [pagination, setPagination] = useState({
 		pageIndex: 0,
 		pageSize: 10,
@@ -18,7 +18,7 @@ export function CategoryTable() {
 	const [searchQuery, setSearchQuery] = useState('');
 	// Custom hook to fetch data using pagination, sorting, and filtering
 	const [debouncedSearchQuery] = useDebouncedValue(searchQuery, 300);
-	const { data, isError, isFetching, isLoading, refetch } = useCategory({
+	const { data, isError, isFetching, isLoading, refetch } = useGetRoleList({
 		pagination: {
 			page: pagination.pageIndex + 1, // Assuming 1-based index for pagination
 			size: pagination.pageSize,
@@ -38,20 +38,20 @@ export function CategoryTable() {
 		refetch();
 	}, [pagination, refetch, searchQuery, debouncedSearchQuery]);
 
-	const columns = useMemo<MRT_ColumnDef<Category>[]>(
+	const columns = useMemo<MRT_ColumnDef<Role>[]>(
 		() => [
 			{
 				accessorKey: "name",
-				header: "Category Name",
+				header: "Role Name",
 			},
 			{
-				accessorKey: "description",
-				header: "Description",
+				accessorKey: "userCount",
+				header: "User Count",
 			},
-			{
-				accessorKey: "subCategoryCount",
-				header: "Sub Category Count",
-			},
+			// {
+			// 	accessorKey: "subCategoryCount",
+			// 	header: "Sub Category Count",
+			// },
 		],
 		[]
 	);
@@ -65,7 +65,7 @@ export function CategoryTable() {
 
 	return (
 		<Paper withBorder radius="md" p="md" mt="lg">
-			<Title order={5}>Category List</Title>
+			<Title order={5}>Role List</Title>
 			<Space h="md" />
 			<TextInput
 				placeholder="Search by name"
