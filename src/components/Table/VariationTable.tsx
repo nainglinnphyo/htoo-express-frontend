@@ -45,10 +45,6 @@ export function VariationTable({ product, isProductLoading }: { product?: Produc
 	const columns = useMemo<MRT_ColumnDef<SizeCount>[]>(
 		() => [
 			{
-				accessorKey: "code",
-				header: "Code",
-			},
-			{
 				accessorKey: "size",
 				header: "Size",
 			},

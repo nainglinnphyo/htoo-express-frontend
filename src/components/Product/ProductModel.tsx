@@ -15,7 +15,6 @@ interface ProductModelProps {
 }
 
 const schema = z.object({
-	code: z.string().min(1, { message: "Code is required" }),
 	name: z.string().min(1, { message: "Name is required" }),
 	brandId: z.string().min(1, { message: "Brand is required" }),
 	categoryId: z.string().min(1, { message: "Category is required" }),
@@ -107,12 +106,6 @@ export function ProductCreateModel({ opened, close, }: ProductModelProps) {
 					})) || []}
 					error={errors.subCategoryId?.message}
 					onChange={(value) => setValue("subCategoryId", value || "")}
-				/>
-
-				<TextInput
-					label="Code"
-					error={errors.code?.message}
-					{...register("code")}
 				/>
 
 				<TextInput

@@ -23,7 +23,7 @@ interface Props {
 	children: React.ReactNode;
 }
 
-const inventoryTabs = ['sub-category-list', 'customer-list', 'product-list', 'branch-list'];
+const inventoryTabs = ['sub-category-list', 'category-list', 'customer-list', 'product-list', 'branch-list'];
 const posTabs = ['customer-list', 'sale-list', 'invoice-list'];
 const userTabs = ['user-list', 'role-list'];
 const dashboardTabs = ['dashboard-list'];
@@ -78,7 +78,7 @@ export default function DashboardLayout({ children }: Props) {
 					tab.tabName
 						.filter((tn: any) => inventoryTabs.includes(tn.name))
 						.map((tn: any) => ({
-							label: `${tn.name.replace('-list', '')}`,
+							label: `${tn.name.replace('-list', '')}`.charAt(0).toUpperCase() + `${tn.name.replace('-list', '')}`.slice(1),
 							link: `/dashboard/${tn.name.replace('-list', '')}`
 						}))
 				);

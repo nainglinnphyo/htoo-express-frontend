@@ -43,10 +43,10 @@ export function ProductTable() {
 
 	const columns = useMemo<MRT_ColumnDef<Product>[]>(
 		() => [
-			{
-				accessorKey: "code",
-				header: "Code",
-			},
+			// {
+			// 	accessorKey: "code",
+			// 	header: "Code",
+			// },
 			{
 				accessorKey: "name",
 				header: "Product Name",
@@ -102,6 +102,9 @@ export function ProductTable() {
 		positionActionsColumn: 'last',
 		renderRowActionMenuItems: ({ row }) => (
 			<>
+				<Menu.Item onClick={() => router.push(`/dashboard/product/variation/add?productId=${row.original.id}`)}>
+					Export Code
+				</Menu.Item >
 				<Menu.Item onClick={() => router.push(`/dashboard/product/variation/add?productId=${row.original.id}`)}>
 					Add Variation
 				</Menu.Item >

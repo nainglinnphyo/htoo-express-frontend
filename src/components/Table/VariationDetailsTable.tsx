@@ -46,10 +46,10 @@ export function VariationDetailsTable({ product, isProductLoading, sizeId }: { p
 
 	const columns = useMemo<MRT_ColumnDef<ProductVariation>[]>(
 		() => [
-			// {
-			// 	accessorKey: "size",
-			// 	header: "Size",
-			// },
+			{
+				accessorKey: "code",
+				header: "Code",
+			},
 			{
 				accessorKey: "color.name",
 				header: "Color",
