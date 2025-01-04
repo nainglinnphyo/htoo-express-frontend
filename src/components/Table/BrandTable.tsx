@@ -1,14 +1,17 @@
 "use client";
 
-import { Paper, Space, Pagination, TextInput } from "@mantine/core";
+import { Paper, Title, Space, Pagination, Select, TextInput } from "@mantine/core";
 import { MantineReactTable, type MRT_ColumnDef } from "mantine-react-table";
 import { useEffect, useMemo, useState } from "react";
-
 import { useDebouncedValue } from "@mantine/hooks";
-import { useGetCustomerList } from "@/services/customer";
-import { Customer } from "@/services/customer/types";
+import { useFetchBrandList } from "@/services/products";
+import { Brand } from "@/services/products/types";
 
-export function CustomerTable() {
+interface BrandTableProps {
+	opened: boolean;
+}
+
+export function BrandTable({ opened }: BrandTableProps) {
 	const [pagination, setPagination] = useState({
 		pageIndex: 0,
 		pageSize: 10,
@@ -19,7 +22,7 @@ export function CustomerTable() {
 	const [searchQuery, setSearchQuery] = useState('');
 	// Custom hook to fetch data using pagination, sorting, and filtering
 	const [debouncedSearchQuery] = useDebouncedValue(searchQuery, 300);
-	const { data, isError, isFetching, isLoading, refetch } = useGetCustomerList({
+	const { data, isError, isFetching, isLoading, refetch } = useFetchBrandList({
 		pagination: {
 			page: pagination.pageIndex + 1, // Assuming 1-based index for pagination
 			size: pagination.pageSize,
@@ -37,21 +40,17 @@ export function CustomerTable() {
 	useEffect(() => {
 		// if (!searchQuery.trim() && !pagination.pageIndex) return;
 		refetch();
-	}, [pagination, refetch, searchQuery, debouncedSearchQuery]);
+	}, [pagination, refetch, searchQuery, debouncedSearchQuery, opened]);
 
-	const columns = useMemo<MRT_ColumnDef<Customer>[]>(
+	const columns = useMemo<MRT_ColumnDef<Brand>[]>(
 		() => [
 			{
 				accessorKey: "name",
-				header: "Customer Name",
+				header: "Brand Name",
 			},
 			{
-				accessorKey: "phone",
-				header: "Phone",
-			},
-			{
-				accessorKey: "address",
-				header: "Address",
+				accessorKey: "shortName",
+				header: "Short Name",
 			},
 		],
 		[]

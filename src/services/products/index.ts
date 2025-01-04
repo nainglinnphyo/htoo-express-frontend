@@ -6,8 +6,10 @@ import {
 } from "@tanstack/react-query";
 import ky from "ky";
 import type {
+	BrandListResponse,
 	BrandResponse,
 	ColorResponse,
+	CreateBrandPayload,
 	createInvoicePayload,
 	CreateProductPayload,
 	CreateProductVariationPayload,
@@ -328,7 +330,6 @@ export const useCreateInvoice = () => {
 };
 
 const getProductVariationForScan = async (code: string) => {
-	console.log("from api ", code);
 	const response = await axios.get(`product/variation/${code}`, {
 		headers: authJsonHeader(),
 	});
@@ -341,3 +342,52 @@ export const useGetProductVariationForScan = (code: string) =>
 		queryFn: () => getProductVariationForScan(code),
 		placeholderData: keepPreviousData,
 	});
+
+const getBrandList = async ({ pagination, filters }: PaginationFilterProps) => {
+	const response = await axios.get(
+		`brand?page=${pagination.page}&size=${pagination.size}&search=${filters?.search}`,
+		{
+			headers: authJsonHeader(),
+		}
+	);
+	return response.data._data;
+};
+
+export const useFetchBrandList = ({
+	pagination,
+	filters,
+}: PaginationFilterProps) =>
+	useQuery<BrandListResponse>({
+		queryKey: ["brand-list"],
+		queryFn: () => getBrandList({ pagination, filters }),
+		placeholderData: keepPreviousData,
+	});
+
+const createBrand = async (payload: CreateBrandPayload) => {
+	const response = await axios.post(
+		"brand",
+		{ ...payload },
+		{ headers: authJsonHeader() }
+	);
+	return response.data;
+};
+
+export const useCreateBrand = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: (payload: CreateBrandPayload) => createBrand(payload),
+		onSuccess: (data) => {
+			if (data) {
+				toast.success(data._metadata.message, {
+					position: "bottom-right",
+				});
+				queryClient.invalidateQueries({ queryKey: ["brand"] });
+			}
+		},
+		onError: (e: any) => {
+			toast.error(e.response.data._metadata.message, {
+				position: "bottom-right",
+			});
+		},
+	});
+};

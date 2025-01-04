@@ -50,7 +50,7 @@ export function VariationTable({ product, isProductLoading }: { product?: Produc
 			},
 			{
 				accessorKey: "count",
-				header: "Variation Count",
+				header: "Color Count",
 			},
 			{
 				accessorKey: "sizeStock",
@@ -97,7 +97,7 @@ export function VariationTable({ product, isProductLoading }: { product?: Produc
 		positionActionsColumn: 'last',
 		renderRowActionMenuItems: ({ row }) => (
 			<>
-				<Menu.Item onClick={() => router.push(`/dashboard/product/variation/size?sizeId=${row.original.id}&productId=${product?.id}&sizeName=${row.original.size}`)}>Variation Details</Menu.Item >
+				<Menu.Item onClick={() => router.push(`/dashboard/product/variation/size?sizeId=${row.original.id}&productId=${product?.id}&sizeName=${row.original.size}`)}>Size Details</Menu.Item >
 			</>
 		),
 	})

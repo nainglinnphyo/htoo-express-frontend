@@ -1,7 +1,6 @@
 "use client";
 
 import { Button, Container, Group, Text, Title } from "@mantine/core";
-import { IconArrowRight, IconStar } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import classes from "./HeroSection.module.css";
 

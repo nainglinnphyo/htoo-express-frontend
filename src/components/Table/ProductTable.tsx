@@ -43,10 +43,10 @@ export function ProductTable() {
 
 	const columns = useMemo<MRT_ColumnDef<Product>[]>(
 		() => [
-			// {
-			// 	accessorKey: "code",
-			// 	header: "Code",
-			// },
+			{
+				accessorKey: "shortName",
+				header: "Short Name",
+			},
 			{
 				accessorKey: "name",
 				header: "Product Name",
@@ -108,14 +108,13 @@ export function ProductTable() {
 				<Menu.Item onClick={() => router.push(`/dashboard/product/variation/add?productId=${row.original.id}`)}>
 					Add Variation
 				</Menu.Item >
-				<Menu.Item onClick={() => router.push(`/dashboard/product/variation?id=${row.original.id}`)}>Variation</Menu.Item >
+				<Menu.Item onClick={() => router.push(`/dashboard/product/variation?id=${row.original.id}`)}>Size</Menu.Item >
 			</>
 		),
 	})
 
 	return (
 		<Paper withBorder radius="md" p="md" mt="lg" >
-			<Title order={5}>Product List</Title>
 			<Space h="md" />
 			<TextInput
 				placeholder="Search by code / name"

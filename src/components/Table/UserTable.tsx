@@ -71,7 +71,6 @@ export function UserTable() {
 
 	return (
 		<Paper withBorder radius="md" p="md" mt="lg">
-			<Title order={5}>User List</Title>
 			<Space h="md" />
 			<TextInput
 				placeholder="Search by name"

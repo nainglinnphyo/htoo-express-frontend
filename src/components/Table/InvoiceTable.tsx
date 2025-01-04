@@ -1,6 +1,6 @@
 "use client";
 
-import { Paper, Title, Space, Pagination, Select, TextInput, Text, Badge, Menu } from "@mantine/core";
+import { Paper, Space, Pagination, TextInput, Text, Badge, Menu } from "@mantine/core";
 import { MantineReactTable, useMantineReactTable, type MRT_ColumnDef } from "mantine-react-table";
 import { useEffect, useMemo, useState } from "react";
 import { useDebouncedValue } from "@mantine/hooks";

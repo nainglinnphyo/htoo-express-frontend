@@ -15,6 +15,7 @@ interface ProductModelProps {
 }
 
 const schema = z.object({
+	shortName: z.string().optional(),
 	name: z.string().min(1, { message: "Name is required" }),
 	brandId: z.string().min(1, { message: "Brand is required" }),
 	categoryId: z.string().min(1, { message: "Category is required" }),
@@ -112,6 +113,11 @@ export function ProductCreateModel({ opened, close, }: ProductModelProps) {
 					label="Product name"
 					error={errors.name?.message}
 					{...register("name")}
+				/>
+				<TextInput
+					label="Product Short Name"
+					error={errors.shortName?.message}
+					{...register("shortName")}
 				/>
 				<TextInput
 					label="Description"

@@ -18,9 +18,8 @@ export default function ProductPage() {
 			const inventoryTabsPermissions = user.role.tabsPermission.filter((tab: any) =>
 				tab.tabName.some((tn: any) => tn.name === 'product-list')
 			)
-			console.log({ inventoryTabsPermissions })
 			const allActions = inventoryTabsPermissions.flatMap((tab: any) => tab.actions)
-			console.log({ allActions })
+
 			setProductPermissions(allActions)
 		}
 	}, [user])

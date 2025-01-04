@@ -30,7 +30,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 const schema = z.object({
 	variations: z.array(
 		z.object({
-			code: z.string().min(1, "Code is required"),
+			code: z.string().optional(),
 			sizeId: z.string().min(1, "Size is required"),
 			colorId: z.string().min(1, "Color is required"),
 			sellingPrice: z.number().min(0, "Selling price must be non-negative"),
@@ -154,6 +154,12 @@ const AddVariationPage = () => {
 
 	const onSubmit = async (data: FormValues) => {
 		setIsSubmitting(true);
+		// const payload = data.variations.map((d)=>{
+		// 	return {
+		// 		...d,
+		// 		code: d.code === '' ? d.
+		// 	}
+		// })
 		createProduct.mutate(
 			{
 				productId,
@@ -207,6 +213,7 @@ const AddVariationPage = () => {
 																control={control}
 																render={({ field }) => (
 																	<TextInput
+																		required={false}
 																		label="Code"
 																		placeholder='Enter code'
 																		error={errors.variations?.[index]?.code?.message}

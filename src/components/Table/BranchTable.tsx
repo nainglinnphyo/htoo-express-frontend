@@ -70,7 +70,6 @@ export function BranchTable() {
 
 	return (
 		<Paper withBorder radius="md" p="md" mt="lg">
-			<Title order={5}>Branch List</Title>
 			<Space h="md" />
 			<TextInput
 				placeholder="Search by name"

@@ -3,6 +3,7 @@ import { Category, SubCategory } from "../categories/types";
 export interface Brand {
 	id: string;
 	name: string;
+	shortName?: string;
 }
 
 export interface Product {
@@ -63,7 +64,7 @@ export interface ProductDetailsResponse {
 
 export interface ProductVariation {
 	id?: string;
-	code: string;
+	code?: string;
 	colorId: string;
 	sizeId: string;
 	size?: Size;
@@ -122,5 +123,15 @@ export interface createInvoicePayload {
 
 export interface ProductVariationForScanResponse {
 	data: ProductVariation[];
+	totalCount: number;
+}
+
+export interface CreateBrandPayload {
+	name: string;
+	shortName?: string;
+}
+
+export interface BrandListResponse {
+	data: Brand[];
 	totalCount: number;
 }

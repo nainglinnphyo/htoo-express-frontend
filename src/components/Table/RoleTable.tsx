@@ -65,7 +65,6 @@ export function RoleTable() {
 
 	return (
 		<Paper withBorder radius="md" p="md" mt="lg">
-			<Title order={5}>Role List</Title>
 			<Space h="md" />
 			<TextInput
 				placeholder="Search by name"

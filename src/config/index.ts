@@ -31,6 +31,18 @@ export const navLinks: NavItem[] = [
 				label: "Branches",
 				link: "/dashboard/branch",
 			},
+			{
+				label: "Brand",
+				link: "/dashboard/brand",
+			},
+			{
+				label: "Size",
+				link: "/dashboard/size",
+			},
+			{
+				label: "Color",
+				link: "/dashboard/color",
+			},
 		],
 	},
 

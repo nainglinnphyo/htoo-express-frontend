@@ -9,6 +9,7 @@ import { Product, ProductVariation } from "@/services/products/types";
 import { useRouter } from "next/navigation";
 import { StockAdjust } from "../Product/StockAdjustModel";
 import ButtonGroup from "../Button/ButtonGroup";
+import Barcode from 'react-barcode';
 
 export function VariationDetailsTable({ product, isProductLoading, sizeId }: { product?: Product, isProductLoading: boolean, sizeId: string }) {
 	const router = useRouter()
@@ -59,10 +60,6 @@ export function VariationDetailsTable({ product, isProductLoading, sizeId }: { p
 						style={{ alignItems: 'center', gap: '0.5rem', }}
 					>
 						<>{row.original.color?.name}</>
-						{/* <ColorSwatch
-							color={row.original.color?.hexCode || ''}
-							size={30}
-						/> */}
 					</Box>
 				),
 			},
