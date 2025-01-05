@@ -226,6 +226,7 @@ const AddVariationPage = () => {
 																control={control}
 																render={({ field }) => (
 																	<Select
+																		searchable
 																		label="Size"
 																		placeholder={sizeLoading ? "Loading..." : "Select a Size"}
 																		data={sizes?.data.map((s) => ({ value: s.id, label: s.name })) || []}
@@ -238,13 +239,42 @@ const AddVariationPage = () => {
 																name={`variations.${index}.colorId`}
 																control={control}
 																render={({ field }) => (
-																	<Select
-																		label="Color"
-																		placeholder={colorLoading ? "Loading..." : "Select a Color"}
-																		data={colors?.data.map((c) => ({ value: c.id, label: c.name })) || []}
-																		error={errors.variations?.[index]?.colorId?.message}
-																		{...field}
-																	/>
+																	<>
+																		<Select
+																			searchable
+																			label="Color"
+																			placeholder={colorLoading ? "Loading..." : "Select a Color"}
+																			data={
+																				colors?.data.map((c) => ({
+																					value: c.id,
+																					label: c.name,
+																					hexCode: c.hexCode, // Include hexCode in the data
+																				})) || []
+																			}
+																			error={errors.variations?.[index]?.colorId?.message}
+																			{...field}
+																		/>
+																		{/* Display the selected hexCode */}
+																		{field.value && (
+																			<div>
+																				Selected Hex Code:{" "}
+																				{
+																					colors?.data.find((c) => c.id === field.value)?.hexCode || "N/A"
+																				}
+																				<div
+																					style={{
+																						width: "20px",
+																						height: "20px",
+																						backgroundColor:
+																							colors?.data.find((c) => c.id === field.value)?.hexCode || "#fff",
+																						border: "1px solid #ccc",
+																						display: "inline-block",
+																						marginLeft: "8px",
+																					}}
+																				></div>
+																			</div>
+																		)}
+																	</>
 																)}
 															/>
 														</Group>

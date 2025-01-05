@@ -68,6 +68,7 @@ export function SubCategoryCreateModel({ opened, close, }: SubCategoryModelProps
 				<Space h="sm" />
 
 				<Select
+					searchable
 					label="Category"
 					placeholder={isLoading ? "Loading..." : "Select a category"}
 					data={categories?.data.map(category => ({

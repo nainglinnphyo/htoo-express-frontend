@@ -91,7 +91,7 @@ export default function SaleVoucherPage() {
 		if (data) {
 			const products: Product[] = data.data.map((p) => ({
 				id: p.id || '',
-				code: p.code,
+				code: p.code || '',
 				category: `${p.product?.brand?.name || ''} / ${p.product?.category.name || ''} / ${p.product?.subCategory.name || ''}`,
 				name: `${p.product?.name || ''} / ${p.size?.name || ''} / ${p.color?.name || ''}`,
 				price: p.sellingPrice || 0,
@@ -220,11 +220,12 @@ export default function SaleVoucherPage() {
 			if (!result.data?.data) return;
 
 			const scannedProduct = result.data.data.find(p => p.code === trimmedText);
+			console.log({ scannedProduct })
 
 			if (scannedProduct) {
 				const product = {
 					id: scannedProduct.id || '',
-					code: scannedProduct.code,
+					code: scannedProduct.code || '',
 					category: `${scannedProduct.product?.brand?.name || ''} / ${scannedProduct.product?.category.name || ''} / ${scannedProduct.product?.subCategory.name || ''}`,
 					name: `${scannedProduct.product?.name || ''} / ${scannedProduct.size?.name || ''} / ${scannedProduct.color?.name || ''}`,
 					price: scannedProduct.sellingPrice || 0,

@@ -75,6 +75,7 @@ export function ProductCreateModel({ opened, close, }: ProductModelProps) {
 				<Space h="sm" />
 
 				<Select
+					searchable
 					label="Brand"
 					placeholder={isLoading ? "Loading..." : "Select a category"}
 					data={brands?.data.map(brand => ({
@@ -86,6 +87,7 @@ export function ProductCreateModel({ opened, close, }: ProductModelProps) {
 				/>
 
 				<Select
+					searchable
 					label="Category"
 					placeholder={categoryLoading ? "Loading..." : "Select a category"}
 					data={categories?.data.map(category => ({
@@ -99,6 +101,7 @@ export function ProductCreateModel({ opened, close, }: ProductModelProps) {
 					error={errors.categoryId?.message}
 				/>
 				<Select
+					searchable
 					label="SubCategory"
 					placeholder={categoryLoading ? "Loading..." : "Select a sub category"}
 					data={categories?.data.find((d) => d.id === selectedCategory)?.subCategory.map(category => ({

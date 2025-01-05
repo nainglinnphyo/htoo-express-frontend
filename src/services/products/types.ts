@@ -135,3 +135,22 @@ export interface BrandListResponse {
 	data: Brand[];
 	totalCount: number;
 }
+
+export interface CreateColorPayload {
+	name: string;
+	hexCode?: string;
+}
+
+export interface ColorListResponse {
+	data: Color[];
+	totalCount: number;
+}
+
+export interface CreateSizePayload {
+	name: string;
+}
+
+export interface SizeListResponse {
+	data: Size[];
+	totalCount: number;
+}

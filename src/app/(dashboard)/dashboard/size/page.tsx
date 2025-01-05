@@ -1,8 +1,8 @@
 'use client'
-import { BranchModel } from "@/components/Branch/BranchModel";
 import { PageContainer } from "@/components/PageContainer/PageContainer";
-import { BranchTable } from "@/components/Table/BranchTable";
-import { Button, Modal } from "@mantine/core";
+import { SizeCreateModel } from "@/components/Product/SizeModel";
+import { SizeTable } from "@/components/Table/SizeTable";
+import { Button } from "@mantine/core";
 import { useDisclosure } from '@mantine/hooks';
 
 export default function BranchPage() {
@@ -10,9 +10,9 @@ export default function BranchPage() {
 
 	return (
 		<PageContainer title="Branch">
-			<BranchModel opened={opened} close={close} />
-			<Button onClick={open}>Create New Branch</Button>
-			<BranchTable />
+			<SizeCreateModel opened={opened} close={close} />
+			<Button onClick={open}>Create New Size</Button>
+			<SizeTable opened={opened} />
 		</PageContainer>
 	);
 }

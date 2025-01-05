@@ -8,11 +8,14 @@ import ky from "ky";
 import type {
 	BrandListResponse,
 	BrandResponse,
+	ColorListResponse,
 	ColorResponse,
 	CreateBrandPayload,
+	CreateColorPayload,
 	createInvoicePayload,
 	CreateProductPayload,
 	CreateProductVariationPayload,
+	CreateSizePayload,
 	handleStockAdjustPayload,
 	ProductDetailsResponse,
 	ProductResponse,
@@ -382,6 +385,104 @@ export const useCreateBrand = () => {
 					position: "bottom-right",
 				});
 				queryClient.invalidateQueries({ queryKey: ["brand"] });
+			}
+		},
+		onError: (e: any) => {
+			toast.error(e.response.data._metadata.message, {
+				position: "bottom-right",
+			});
+		},
+	});
+};
+
+const getColorList = async ({ pagination, filters }: PaginationFilterProps) => {
+	const response = await axios.get(
+		`product/color?page=${pagination.page}&size=${pagination.size}&search=${filters?.search}`,
+		{
+			headers: authJsonHeader(),
+		}
+	);
+	return response.data._data;
+};
+
+export const useFetchColorList = ({
+	pagination,
+	filters,
+}: PaginationFilterProps) =>
+	useQuery<ColorListResponse>({
+		queryKey: ["color-list"],
+		queryFn: () => getColorList({ pagination, filters }),
+		placeholderData: keepPreviousData,
+	});
+
+const createColor = async (payload: CreateColorPayload) => {
+	const response = await axios.post(
+		"product/color",
+		{ ...payload },
+		{ headers: authJsonHeader() }
+	);
+	return response.data;
+};
+
+export const useCreateColor = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: (payload: CreateColorPayload) => createColor(payload),
+		onSuccess: (data) => {
+			if (data) {
+				toast.success(data._metadata.message, {
+					position: "bottom-right",
+				});
+				queryClient.invalidateQueries({ queryKey: ["color"] });
+			}
+		},
+		onError: (e: any) => {
+			toast.error(e.response.data._metadata.message, {
+				position: "bottom-right",
+			});
+		},
+	});
+};
+
+const getSizeList = async ({ pagination, filters }: PaginationFilterProps) => {
+	const response = await axios.get(
+		`product/size?page=${pagination.page}&size=${pagination.size}&search=${filters?.search}`,
+		{
+			headers: authJsonHeader(),
+		}
+	);
+	return response.data._data;
+};
+
+export const useFetchSizeList = ({
+	pagination,
+	filters,
+}: PaginationFilterProps) =>
+	useQuery<ColorListResponse>({
+		queryKey: ["size-list"],
+		queryFn: () => getSizeList({ pagination, filters }),
+		placeholderData: keepPreviousData,
+	});
+
+const createSize = async (payload: CreateSizePayload) => {
+	const response = await axios.post(
+		"product/size",
+		{ ...payload },
+		{ headers: authJsonHeader() }
+	);
+	return response.data;
+};
+
+export const useCreateSize = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: (payload: CreateSizePayload) => createSize(payload),
+		onSuccess: (data) => {
+			if (data) {
+				toast.success(data._metadata.message, {
+					position: "bottom-right",
+				});
+				queryClient.invalidateQueries({ queryKey: ["size"] });
 			}
 		},
 		onError: (e: any) => {

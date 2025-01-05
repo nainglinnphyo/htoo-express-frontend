@@ -1,18 +1,19 @@
 'use client'
 import { BranchModel } from "@/components/Branch/BranchModel";
 import { PageContainer } from "@/components/PageContainer/PageContainer";
-import { BranchTable } from "@/components/Table/BranchTable";
+import { ColorCreateModel } from "@/components/Product/ColorModel";
+import { ColorTable } from "@/components/Table/ColorTable";
 import { Button, Modal } from "@mantine/core";
 import { useDisclosure } from '@mantine/hooks';
 
-export default function BranchPage() {
+export default function ColorPage() {
 	const [opened, { open, close }] = useDisclosure(false);
 
 	return (
-		<PageContainer title="Branch">
-			<BranchModel opened={opened} close={close} />
-			<Button onClick={open}>Create New Branch</Button>
-			<BranchTable />
+		<PageContainer title="Color">
+			<ColorCreateModel close={close} opened={opened} />
+			<Button onClick={open}>Create New Color</Button>
+			<ColorTable opened={opened} />
 		</PageContainer>
 	);
 }
