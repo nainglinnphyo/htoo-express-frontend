@@ -154,3 +154,20 @@ export interface SizeListResponse {
 	data: Size[];
 	totalCount: number;
 }
+
+export interface UpdateProductVariationPayload {
+	id?: string;
+	code?: string;
+	colorId: string;
+	sizeId: string;
+	size?: Size;
+	color?: Color;
+	images: string[];
+	product?: Product;
+	purchasedPrice?: number;
+	sellingPrice?: number;
+	branchStock?: number;
+	image?: {
+		path: string;
+	}[];
+}

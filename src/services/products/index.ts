@@ -4,7 +4,6 @@ import {
 	useQuery,
 	useQueryClient,
 } from "@tanstack/react-query";
-import ky from "ky";
 import type {
 	BrandListResponse,
 	BrandResponse,
@@ -24,6 +23,7 @@ import type {
 	ProductVariationResponse,
 	ProductVariationSizeResponse,
 	SizeResponse,
+	UpdateProductVariationPayload,
 } from "./types";
 import axios, { authJsonHeader } from "..";
 import { toast } from "react-toastify";
@@ -171,7 +171,7 @@ const getProductVariationSize = async (
 	productId: string
 ) => {
 	const response = await axios.get(
-		`product/size?page=${pagination.page}&size=${pagination.size}&search=${filters?.search}&productId=${productId}`,
+		`product/size-group?page=${pagination.page}&size=${pagination.size}&search=${filters?.search}&productId=${productId}`,
 		{
 			headers: authJsonHeader(),
 		}
@@ -483,6 +483,38 @@ export const useCreateSize = () => {
 					position: "bottom-right",
 				});
 				queryClient.invalidateQueries({ queryKey: ["size"] });
+			}
+		},
+		onError: (e: any) => {
+			toast.error(e.response.data._metadata.message, {
+				position: "bottom-right",
+			});
+		},
+	});
+};
+
+const updateProductVariation = async (
+	payload: UpdateProductVariationPayload
+) => {
+	const response = await axios.put(
+		"product/variation",
+		{ ...payload },
+		{ headers: authJsonHeader() }
+	);
+	return response.data;
+};
+
+export const useUpdateProductVariation = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: (payload: UpdateProductVariationPayload) =>
+			updateProductVariation(payload),
+		onSuccess: (data) => {
+			if (data) {
+				toast.success(data._metadata.message, {
+					position: "bottom-right",
+				});
+				queryClient.invalidateQueries({ queryKey: ["product-variation"] });
 			}
 		},
 		onError: (e: any) => {

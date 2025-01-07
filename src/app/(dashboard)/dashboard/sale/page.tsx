@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -68,7 +68,16 @@ export default function SaleVoucherPage() {
 	const [formValue, setFormValue] = useState<any | null>(null);
 	const [totalTax, setTotalTax] = useState(0);
 
-	const [currentScanProduct, setCurrentScanProduct] = useState<Product | null>(null);
+	const [scanText, setScanText] = useState('');
+
+
+	const inputRef = useRef<HTMLInputElement>(null);
+
+	useEffect(() => {
+		if (inputRef.current) {
+			inputRef.current.focus();
+		}
+	}, []);
 
 	const playNotificationSound = () => {
 		const audio = new Audio('/scan.mp3');
@@ -206,63 +215,6 @@ export default function SaleVoucherPage() {
 		setConfirmModalOpened(false);
 	}
 
-	const updateScanText = async (text: string) => {
-		try {
-
-			if (!text?.trim()) return;
-
-			const trimmedText = text.trim();
-
-			setSearchQuery('');
-
-			const result = await refetch();
-
-			if (!result.data?.data) return;
-
-			const scannedProduct = result.data.data.find(p => p.code === trimmedText);
-			console.log({ scannedProduct })
-
-			if (scannedProduct) {
-				const product = {
-					id: scannedProduct.id || '',
-					code: scannedProduct.code || '',
-					category: `${scannedProduct.product?.brand?.name || ''} / ${scannedProduct.product?.category.name || ''} / ${scannedProduct.product?.subCategory.name || ''}`,
-					name: `${scannedProduct.product?.name || ''} / ${scannedProduct.size?.name || ''} / ${scannedProduct.color?.name || ''}`,
-					price: scannedProduct.sellingPrice || 0,
-					image: scannedProduct.image?.map((d) => {
-						return d.path
-					}) || []
-				};
-
-				setCurrentScanProduct(product)
-
-				setVoucher(prevVoucher => {
-					const existingProductIndex = prevVoucher.findIndex(item => item.id === product.id);
-					if (existingProductIndex !== -1) {
-						// If product exists, update its quantity
-						const updatedVoucher = [...prevVoucher];
-						updatedVoucher[existingProductIndex] = {
-							...updatedVoucher[existingProductIndex],
-							qty: (updatedVoucher[existingProductIndex].qty || 0) + 1,
-						};
-						return updatedVoucher;
-					} else {
-						// If product is new, add it to voucher with quantity 1
-						return [...prevVoucher, { ...product, qty: 1 }];
-					}
-				});
-
-				setProductQuantities(prevQuantities => ({
-					...prevQuantities,
-					[product.id]: (prevQuantities[product.id] || 0) + 1,
-				}));
-				playNotificationSound()
-			}
-		} catch (error) {
-			console.error('Error processing scanned product:', error);
-		}
-	};
-
 	return (
 		<AnimatedPageTransition>
 			<Container size="xl">
@@ -272,7 +224,14 @@ export default function SaleVoucherPage() {
 							<Card shadow="sm" radius="md" withBorder mb='md'>
 								<Text fw={500} size="lg">Barcode Scanner</Text>
 								<Group>
-									<ScanPage updateScanText={updateScanText} scannedProduct={currentScanProduct} />
+									<TextInput
+										leftSection={<IconSearch style={{ width: 18, height: 18 }} />}
+										placeholder="Scan Here"
+										value={scanText}
+										ref={inputRef}
+										onChange={(e) => setScanText(e.target.value)}
+										style={{ flexGrow: 1 }}
+									/>
 								</Group>
 							</Card>
 							<Group mb="md">

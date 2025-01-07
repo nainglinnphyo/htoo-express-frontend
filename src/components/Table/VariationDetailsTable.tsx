@@ -8,8 +8,7 @@ import { useFetchProductVariation } from "@/services/products";
 import { Product, ProductVariation } from "@/services/products/types";
 import { useRouter } from "next/navigation";
 import { StockAdjust } from "../Product/StockAdjustModel";
-import ButtonGroup from "../Button/ButtonGroup";
-import Barcode from 'react-barcode';
+import { VariationEditModel } from "../Product/VariationEditModel";
 
 export function VariationDetailsTable({ product, isProductLoading, sizeId }: { product?: Product, isProductLoading: boolean, sizeId: string }) {
 	const router = useRouter()
@@ -19,6 +18,7 @@ export function VariationDetailsTable({ product, isProductLoading, sizeId }: { p
 	});
 
 	const [opened, { open, close }] = useDisclosure(false);
+	const [openedEdit, { open: openEdit, close: closeEdit }] = useDisclosure(false);
 
 
 	const [searchQuery, setSearchQuery] = useState('');
@@ -136,10 +136,6 @@ export function VariationDetailsTable({ product, isProductLoading, sizeId }: { p
 	);
 
 
-
-
-
-
 	// Calculate total row count and page count
 	const rowCount = data?.totalCount ?? 0;
 	const pageCount = Math.ceil(rowCount / pagination.pageSize);
@@ -149,6 +145,11 @@ export function VariationDetailsTable({ product, isProductLoading, sizeId }: { p
 	const openModal = (row: ProductVariation) => {
 		setSelectedRow(row);
 		open()
+	};
+
+	const openEdtModal = (row: ProductVariation) => {
+		setSelectedRow(row);
+		openEdit()
 	};
 
 
@@ -168,6 +169,7 @@ export function VariationDetailsTable({ product, isProductLoading, sizeId }: { p
 		columnResizeMode: 'onEnd',
 		renderRowActionMenuItems: ({ row }) => (
 			<>
+				<Menu.Item onClick={() => openEdtModal(row.original)}>Edit</Menu.Item >
 				<Menu.Item onClick={() => openModal(row.original)}>Adjust Stock</Menu.Item >
 			</>
 		),
@@ -184,6 +186,7 @@ export function VariationDetailsTable({ product, isProductLoading, sizeId }: { p
 				style={{ marginBottom: '20px' }}
 			/>
 			{selectedRow && <StockAdjust opened={opened} close={close} currentRow={selectedRow} />}
+			{selectedRow && <VariationEditModel opened={openedEdit} close={closeEdit} currentRow={selectedRow} refetch={refetch} />}
 			<MantineReactTable
 				table={table}
 			/>
