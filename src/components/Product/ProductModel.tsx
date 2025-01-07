@@ -43,6 +43,7 @@ export function ProductCreateModel({ opened, close, }: ProductModelProps) {
 	const onSubmit = (data: CreateProductPayload) => {
 		createProduct.mutate(
 			{
+				code: new Date().toString(),
 				...data,
 			},
 			{

@@ -46,6 +46,7 @@ export interface ColorResponse {
 }
 
 export interface CreateProductPayload {
+	code?: string;
 	name: string;
 	description: string;
 	categoryId: string;
