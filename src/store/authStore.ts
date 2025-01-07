@@ -7,7 +7,7 @@ interface User {
 	id: string;
 	name: string;
 	email: string;
-	role?: Role;
+	role?: Role | null;
 }
 
 interface Role {
@@ -113,25 +113,28 @@ const useAuthStore = create<AuthState>()(
 									email: data._data.user.email,
 									id: data._data.user.id,
 									name: data._data.user.email,
-									role: {
-										name: data._data.user.userRole.name,
-										tablesPermission:
-											data._data.user.userRole.roleOnPermission.map(
-												(d: any) => {
-													return {
-														tableName: d.permissionResource.permissionColumn,
-													};
-												}
-											),
-										tabsPermission:
-											data._data.user.userRole.roleOnPermission.map(
-												(d: any) => {
-													return {
-														tabName: d.permissionResource.permissionTab,
-													};
-												}
-											),
-									},
+									role: !data._data.user.userRole
+										? null
+										: {
+												name: data._data.user.userRole.name,
+												tablesPermission:
+													data._data.user.userRole.roleOnPermission.map(
+														(d: any) => {
+															return {
+																tableName:
+																	d.permissionResource.permissionColumn,
+															};
+														}
+													),
+												tabsPermission:
+													data._data.user.userRole?.roleOnPermission.map(
+														(d: any) => {
+															return {
+																tabName: d.permissionResource.permissionTab,
+															};
+														}
+													),
+										  },
 								},
 							});
 						} else {
