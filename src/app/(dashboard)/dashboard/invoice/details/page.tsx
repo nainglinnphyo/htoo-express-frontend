@@ -81,19 +81,19 @@ function InvoicePreview() {
 					</Group>
 					<Grid>
 						<Grid.Col span={6}>
-							<Text><strong>Name:</strong> {data?.data.customer.name}</Text>
+							<Text><strong>Name:</strong> {data?.data.customer?.name}</Text>
 						</Grid.Col>
 						<Grid.Col span={6}>
-							<Text><strong>Phone:</strong> {data?.data.customer.phone}</Text>
+							<Text><strong>Phone:</strong> {data?.data.customer?.phone}</Text>
 						</Grid.Col>
 						<Grid.Col span={12}>
-							<Text><strong>Address:</strong> {data?.data.customer.address}</Text>
+							<Text><strong>Address:</strong> {data?.data.customer?.address}</Text>
 						</Grid.Col>
 					</Grid>
 				</Card>
 
 				<Card shadow="sm" p="lg" radius="md" withBorder className="invoice-details">
-					<Group mb="md">
+					<Group mb="md" className='no-print'>
 						<ThemeIcon size="lg" color="blue" variant="light" radius="md">
 							<IconShoppingCart size={20} />
 						</ThemeIcon>

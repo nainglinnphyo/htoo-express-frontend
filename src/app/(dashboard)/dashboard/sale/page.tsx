@@ -212,7 +212,22 @@ export default function SaleVoucherPage() {
 
 		const taxAmount = subtotal * (Number(formValue.taxRate) / 100)
 		const finalTotal = subtotal - discountAmount + taxAmount
-
+		console.log({
+			address: formValue.address,
+			name: formValue.customerName,
+			phone: formValue.customerPhone,
+			note: formValue.note,
+			grossPrice: finalTotal,
+			taxAmount: taxAmount,
+			discountType: formValue.discountType,
+			discountValue: formValue.discountValue,
+			discountAmount: discountAmount,
+			variation: voucher.map((d) => ({
+				qty: productQuantities[d.id],
+				total: d.price * productQuantities[d.id],
+				variationId: d.id,
+			})),
+		})
 		try {
 			createInvoice.mutate(
 				{
@@ -222,9 +237,9 @@ export default function SaleVoucherPage() {
 					note: formValue.note,
 					grossPrice: finalTotal,
 					taxAmount: taxAmount,
-					// discountType: formValue.discountType,
-					// discountValue: formValue.discountValue,
-					// discountAmount: discountAmount,
+					discountType: formValue.discountType,
+					discountValue: formValue.discountValue,
+					discountAmount: discountAmount,
 					variation: voucher.map((d) => ({
 						qty: productQuantities[d.id],
 						total: d.price * productQuantities[d.id],

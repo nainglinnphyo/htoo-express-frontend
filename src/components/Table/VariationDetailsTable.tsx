@@ -9,6 +9,7 @@ import { Product, ProductVariation } from "@/services/products/types";
 import { useRouter } from "next/navigation";
 import { StockAdjust } from "../Product/StockAdjustModel";
 import { VariationEditModel } from "../Product/VariationEditModel";
+import useAuthStore from "@/store/authStore";
 
 export function VariationDetailsTable({ product, isProductLoading, sizeId }: { product?: Product, isProductLoading: boolean, sizeId: string }) {
 	const router = useRouter()
@@ -19,6 +20,8 @@ export function VariationDetailsTable({ product, isProductLoading, sizeId }: { p
 
 	const [opened, { open, close }] = useDisclosure(false);
 	const [openedEdit, { open: openEdit, close: closeEdit }] = useDisclosure(false);
+
+	const { user } = useAuthStore()
 
 
 	const [searchQuery, setSearchQuery] = useState('');
@@ -46,93 +49,98 @@ export function VariationDetailsTable({ product, isProductLoading, sizeId }: { p
 	}, [pagination, refetch, searchQuery, debouncedSearchQuery]);
 
 	const columns = useMemo<MRT_ColumnDef<ProductVariation>[]>(
-		() => [
-			{
-				accessorKey: "code",
-				header: "Code",
-			},
-			{
-				accessorKey: "color.name",
-				header: "Color",
-				Cell: ({ row }) => (
-					<Box
-						display={'flex'}
-						style={{ alignItems: 'center', gap: '0.5rem', }}
-					>
-						<>{row.original.color?.name}</>
-					</Box>
-				),
-			},
-			{
-				accessorKey: "sellingPrice",
-				header: "Selling Price",
-			},
-			{
-				accessorKey: "purchasedPrice",
-				header: "Purchased Price",
-			},
-			{
-				accessorKey: "branchStock",
-				header: "Branch Stock",
-				Cell: ({ row }) => (
-					<Text size="sm" fw={900}>{row.original.branchStock} left</Text>
-				),
-			},
-			{
-				accessorKey: "image",
-				header: "Image",
-				Cell: ({ row }) => (
-					<Box
-						display={'flex'}
-						style={{ alignItems: 'center', gap: '0.5rem' }}
-					>
-						{row.original.image && row.original.image.length > 0 ? (
-							row.original.image.map((d) => (
-								<Image
-									style={{ cursor: "pointer" }}
-									src={d.path}
-									alt=""
-									radius="md"
-									fit="contain"
-									height={50}
-									width={50}
-									onClick={() => {
-										const modal = document.createElement('div');
-										modal.style.position = 'fixed';
-										modal.style.top = '0';
-										modal.style.left = '0';
-										modal.style.width = '100%';
-										modal.style.height = '100%';
-										modal.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-										modal.style.display = 'flex';
-										modal.style.justifyContent = 'center';
-										modal.style.alignItems = 'center';
-										modal.style.zIndex = '1000';
+		() => {
+			const baseColumns = [
+				{
+					accessorKey: "code",
+					header: "Code",
+				},
+				{
+					accessorKey: "color.name",
+					header: "Color",
+					Cell: ({ row }: any) => (
+						<Box
+							display={'flex'}
+							style={{ alignItems: 'center', gap: '0.5rem', }}
+						>
+							<>{row.original.color?.name}</>
+						</Box>
+					),
+				},
+				{
+					accessorKey: "sellingPrice",
+					header: "Selling Price",
+				},
+				{
+					accessorKey: "branchStock",
+					header: "Branch Stock",
+					Cell: ({ row }: any) => (
+						<Text size="sm" fw={900}>{row.original.branchStock} left</Text>
+					),
+				},
+				{
+					accessorKey: "image",
+					header: "Image",
+					Cell: ({ row }: any) => (
+						<Box
+							display={'flex'}
+							style={{ alignItems: 'center', gap: '0.5rem' }}
+						>
+							{row.original.image && row.original.image.length > 0 ? (
+								row.original.image.map((d: any) => (
+									<Image
+										style={{ cursor: "pointer" }}
+										src={d.path}
+										alt=""
+										radius="md"
+										fit="contain"
+										height={50}
+										width={50}
+										onClick={() => {
+											const modal = document.createElement('div');
+											modal.style.position = 'fixed';
+											modal.style.top = '0';
+											modal.style.left = '0';
+											modal.style.width = '100%';
+											modal.style.height = '100%';
+											modal.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+											modal.style.display = 'flex';
+											modal.style.justifyContent = 'center';
+											modal.style.alignItems = 'center';
+											modal.style.zIndex = '1000';
 
-										const modalImage: any = document.createElement('img');
-										modalImage.src = d.path;
-										modalImage.alt = d.path;
-										modalImage.style.maxWidth = '90%';
-										modalImage.style.maxHeight = '90%';
+											const modalImage: any = document.createElement('img');
+											modalImage.src = d.path;
+											modalImage.alt = d.path;
+											modalImage.style.maxWidth = '90%';
+											modalImage.style.maxHeight = '90%';
 
-										modal.appendChild(modalImage);
-										document.body.appendChild(modal);
+											modal.appendChild(modalImage);
+											document.body.appendChild(modal);
 
-										modal.addEventListener('click', () => {
-											document.body.removeChild(modal);
-										});
-									}}
-								/>
-							))
-						) : (
-							<span>No image available</span>
-						)}
-					</Box>
-				),
+											modal.addEventListener('click', () => {
+												document.body.removeChild(modal);
+											});
+										}}
+									/>
+								))
+							) : (
+								<span>No image available</span>
+							)}
+						</Box>
+					),
 
-			},
-		],
-		[]
+				},
+			];
+			if (user?.email === "admin@gmail.com") {
+				baseColumns.splice(3, 0, {
+					accessorKey: "purchasedPrice",
+					header: "Purchased Price",
+				});
+			}
+			return baseColumns
+		},
+		[user?.email]
 	);
 
 

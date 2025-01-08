@@ -55,6 +55,20 @@ export function InvoiceTable() {
 			},
 			{
 				accessorKey: "grossPrice",
+				header: "Gross Price",
+				Cell: ({ row }) => (
+					<Text size="sm" fw={900}>{row.original.grossPrice} Ks</Text>
+				),
+			},
+			{
+				accessorKey: "discountPrice",
+				header: "Discount Price",
+				Cell: ({ row }) => (
+					<Text size="sm" fw={900}>{row.original.grossPrice} Ks</Text>
+				),
+			},
+			{
+				accessorKey: "discountPrice",
 				header: "Total Price",
 				Cell: ({ row }) => (
 					<Text size="sm" fw={900}>{row.original.grossPrice} Ks</Text>
