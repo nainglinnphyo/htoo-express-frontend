@@ -10,9 +10,9 @@ export default function AuthLayout({ children }: Props) {
 	return (
 		<AuthCheck redirectTo="/dashboard" shouldBeAuthenticated={false}>
 			<Box className={classes.wrapper}>
-				<Title order={1} fw="bolder">
+				{/* <Title order={1} fw="bolder">
 					Mantine Admin
-				</Title>
+				</Title> */}
 				<Box w={400}>{children}</Box>
 			</Box>
 		</AuthCheck>

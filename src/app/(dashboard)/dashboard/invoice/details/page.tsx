@@ -22,6 +22,8 @@ import { IconUser, IconShoppingCart, IconFileInvoice, IconPrinter } from '@table
 import { FormattedNumber } from '@/components/Text/NumberFormatter'
 import { useGetInvoiceDetails } from '@/services/invoice'
 import { useSearchParams } from 'next/navigation'
+import './print.css'
+import { LogoAndAddress } from '@/components/Invoice/LogoAndAddress'
 
 const fadeIn = {
 	hidden: { opacity: 0 },
@@ -50,7 +52,8 @@ function InvoicePreview() {
 	return (
 		<Container size="md" py="xl" className="invoice-container">
 			<motion.div initial="hidden" animate="visible" variants={fadeIn}>
-				<Paper shadow="md" p="xl" radius="md" withBorder mb="xl" style={{ background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)' }} className="invoice-header">
+				<LogoAndAddress />
+				<Paper shadow="md" p="xl" radius="md" withBorder mb="xl" style={{ background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)' }} className="invoice-header no-print">
 					<Group mb="md">
 						<Group>
 							<Title order={2}>Invoice Preview</Title>
@@ -69,7 +72,7 @@ function InvoicePreview() {
 					<Text size="sm" color="dimmed" fw={600}>Invoice ID: {data?.data.invoiceId}</Text>
 				</Paper>
 
-				<Card shadow="sm" p="lg" radius="md" withBorder mb="xl" className="customer-info">
+				<Card shadow="sm" p="lg" radius="md" withBorder mb="xl" className="customer-info no-print">
 					<Group mb="md">
 						<ThemeIcon size="lg" color="blue" variant="light" radius="md">
 							<IconUser size={20} />
@@ -100,7 +103,7 @@ function InvoicePreview() {
 						<thead>
 							<tr>
 								<th style={{ textAlign: 'start' }}>Product</th>
-								<th style={{ textAlign: 'start' }}>Category</th>
+								<th className='no-print' style={{ textAlign: 'start' }}>Category</th>
 								<th style={{ textAlign: 'right' }}>Price</th>
 								<th style={{ textAlign: 'right' }}>Quantity</th>
 								<th style={{ textAlign: 'right' }}>Total</th>
@@ -110,7 +113,7 @@ function InvoicePreview() {
 							{data?.data.invoiceOrderProduct.map((product) => (
 								<tr key={product.productVariation.id}>
 									<td>{product.productVariation.product?.name} / {product.productVariation.size?.name} / {product.productVariation.color?.name}</td>
-									<td>{product.productVariation.product?.category.name} / {product.productVariation.product?.subCategory.name}</td>
+									<td className='no-print'>  {product.productVariation.product?.category.name} / {product.productVariation.product?.subCategory.name}</td>
 									<td style={{ textAlign: 'right' }}>
 										<Flex justify="flex-end" align="center">
 											<Text size="sm" mr={4}>Ks</Text>
@@ -160,3 +163,4 @@ function InvoicePreview() {
 }
 
 export default InvoicePreview
+

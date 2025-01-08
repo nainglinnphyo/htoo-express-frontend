@@ -10,6 +10,7 @@ import {
 	PasswordInput,
 	TextInput,
 	Text,
+	Image,
 } from "@mantine/core"
 import { useRouter } from "next/navigation"
 import useAuthStore from "@/store/authStore"
@@ -36,6 +37,16 @@ export function LoginForm() {
 
 	return (
 		<Card withBorder shadow="md" p={30} mt={30} radius="md">
+			<Image
+				src="/htoo.png"
+				alt="Company Logo"
+				width={40}
+				height={40}
+				fit="contain"
+				mx="auto"
+			// mb="xl"
+			/>
+
 			<form onSubmit={handleSubmit}>
 				<TextInput
 					label="Email"
@@ -60,11 +71,11 @@ export function LoginForm() {
 					</Text>
 				)}
 				{/* <Group mt="md" justify="space-between">
-					<Checkbox label="Remember me" />
-					<Anchor component="button" type="button" size="sm" onClick={() => router.push("/forgot-password")}>
-						Forgot Password?
-					</Anchor>
-				</Group> */}
+          <Checkbox label="Remember me" />
+          <Anchor component="button" type="button" size="sm" onClick={() => router.push("/forgot-password")}>
+            Forgot Password?
+          </Anchor>
+        </Group> */}
 				<Button fullWidth mt="xl" type="submit" loading={isLoading}>
 					Sign In
 				</Button>
@@ -72,4 +83,3 @@ export function LoginForm() {
 		</Card>
 	)
 }
-

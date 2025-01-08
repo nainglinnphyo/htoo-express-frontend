@@ -1,0 +1,35 @@
+@media print {
+	.no-print {
+		display: none !important;
+	}
+
+	body * {
+		visibility: hidden;
+	}
+
+	.invoice-container,
+	.invoice-container * {
+		visibility: visible;
+	}
+
+	.invoice-container {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 100%;
+	}
+
+	.print-only {
+		display: block !important;
+		visibility: visible !important;
+	}
+
+	.logo-and-address {
+		text-align: center;
+		margin-bottom: 2rem;
+	}
+}
+
+.print-only {
+	display: none;
+}

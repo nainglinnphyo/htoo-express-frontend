@@ -26,6 +26,7 @@ import {
 	Skeleton,
 	Loader,
 	LoadingOverlay,
+	NumberInput,
 } from '@mantine/core'
 import { IconShoppingCart, IconPlus, IconUser, IconSearch } from '@tabler/icons-react'
 import { useCreateInvoice, useGetProductVariationForVoucher } from '@/services/products'
@@ -53,7 +54,9 @@ const formSchema = z.object({
 	customerPhone: z.string(),
 	address: z.string(),
 	taxRate: z.number().min(0).max(100),
-	note: z.string().optional()
+	note: z.string().optional(),
+	discountType: z.string().optional(),
+	discountValue: z.number().default(0),
 })
 
 type FormValues = z.infer<typeof formSchema>
@@ -67,6 +70,9 @@ export default function SaleVoucherPage() {
 	const [confirmModalOpened, setConfirmModalOpened] = useState(false);
 	const [formValue, setFormValue] = useState<any | null>(null);
 	const [totalTax, setTotalTax] = useState(0);
+	const [discountType, setDiscountType] = useState('MMMK');
+	const [discountValue, setDiscountValue] = useState(0);
+	const [discountAmount, setDiscountAmount] = useState(0);
 
 	const [scanText, setScanText] = useState('');
 
@@ -121,13 +127,14 @@ export default function SaleVoucherPage() {
 		refetch();
 	}, [debouncedSearchQuery, refetch]);
 
-	const { control, handleSubmit, formState: { errors }, } = useForm<FormValues>({
+	const { control, handleSubmit, formState: { errors }, setValue } = useForm<FormValues>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
 			customerName: '',
 			customerPhone: '',
 			address: '',
 			taxRate: 0,
+			discountValue: 0
 		},
 	})
 
@@ -215,6 +222,26 @@ export default function SaleVoucherPage() {
 		setConfirmModalOpened(false);
 	}
 
+	const handleDiscountAmountChange = (value: number | undefined) => {
+		if (!value) value = 0;
+		if (discountType === 'PERCENTAGE') {
+			// Percentage discount calculation
+			setDiscountAmount((value / 100) * subtotal);
+		} else if (discountType === 'MMK') {
+			// Flat discount calculation
+			setDiscountAmount(value);
+		}
+		setValue('discountValue', value); // Update form state
+	};
+
+	const handleDiscountTypeChange = (type: string) => {
+		setDiscountType(type); // Update discount type
+		// Reset discount value based on the new type immediately
+		const updatedDiscountValue = 0; // Reset to 0 when the type changes
+		setDiscountAmount(updatedDiscountValue);
+		setValue('discountValue', updatedDiscountValue);
+	};
+	const total = (subtotal - discountAmount) * (1 + Number(control._formValues.taxRate) / 100);
 	return (
 		<AnimatedPageTransition>
 			<Container size="xl">
@@ -412,13 +439,54 @@ export default function SaleVoucherPage() {
 											<FormattedNumber value={Number((subtotal * (Number(control._formValues.taxRate) / 100)).toFixed(2))} fw={600} />
 										</Flex>
 									</Flex>
+									<Flex justify="space-between" align="center" mb="sm">
+										<Controller
+											name="discountType"
+											control={control}
+											render={({ field }) => (
+												<Select
+													label="Discount Type"
+													placeholder="Select discount type"
+													value={discountType}
+													onChange={(type) => {
+														if (type) {
+															setDiscountValue(0)
+															setDiscountAmount(0)
+															setValue('discountValue', 0)
+															handleDiscountTypeChange(type); // Update state
+															field.onChange(type); // Update React Hook Form
+														}
+													}}
+													data={[
+														{ value: 'MMK', label: 'Ks' },
+														{ value: 'PERCENTAGE', label: '%' },
+													]}
+													error={errors.discountType?.message}
+													style={{ width: '120px' }}
+												/>
+											)}
+										/>
+										<NumberInput
+											label="Discount Value"
+											placeholder="Enter discount"
+											min={0}
+											max={100}
+											value={formValue?.discountValue || 0}
+											onChange={(value) => {
+												handleDiscountAmountChange(parseFloat(value.toString()))
+											}}
+											error={errors.discountValue?.message}
+											style={{ flexGrow: 1 }}
+										/>
+									</Flex>
+
 								</Stack>
 								<Divider my="sm" />
 								<Flex justify="space-between" align="center">
 									<Text fw={500} size="lg">Total:</Text>
 									<Flex align="center">
 										<Text size="sm" mr={4}>Ks</Text>
-										<FormattedNumber value={Number((subtotal * (1 + Number(control._formValues.taxRate) / 100)).toFixed(2))} fw={600} size="lg" />
+										<FormattedNumber value={Number(total)} fw={600} size="lg" />
 									</Flex>
 								</Flex>
 								<Button type="submit" fullWidth mt="md" disabled={voucher.length === 0}>
