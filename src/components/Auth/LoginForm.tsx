@@ -38,7 +38,7 @@ export function LoginForm() {
 	return (
 		<Card withBorder shadow="md" p={30} mt={30} radius="md">
 			<Image
-				src="/images/htoo.png"
+				src="/static/images/Htoo.png"
 				alt="Company Logo"
 				width={40}
 				height={40}

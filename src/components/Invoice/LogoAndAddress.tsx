@@ -4,7 +4,7 @@ export function LogoAndAddress() {
 	return (
 		<Box className="logo-and-address print-only" ta="center" mb="md" style={{ maxWidth: '300px', margin: '0 auto', alignItems: 'center' }}>
 			<Image
-				src="/htoo.png"
+				src="/static/images/Htoo.png"
 				alt="Company Logo"
 				width={80}
 				height={80}
