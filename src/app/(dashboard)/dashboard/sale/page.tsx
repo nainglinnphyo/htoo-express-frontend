@@ -36,7 +36,6 @@ import { FormattedNumber } from '@/components/Text/NumberFormatter'
 import { AnimatePresence } from 'framer-motion'
 import { AnimatedPageTransition } from '@/components/Product/AnimatedPageTransition'
 import { AnimatedProductCard } from '@/components/Product/AnimatedProductCard'
-import ScanPage from '../scan/page'
 
 interface Product {
 	id: string
@@ -55,7 +54,7 @@ const formSchema = z.object({
 	address: z.string(),
 	taxRate: z.number().min(0).max(100),
 	note: z.string().optional(),
-	discountType: z.string().optional(),
+	discountType: z.string(),
 	discountValue: z.number().default(0),
 })
 
@@ -67,30 +66,28 @@ export default function SaleVoucherPage() {
 	const [searchQuery, setSearchQuery] = useState('')
 	const [voucher, setVoucher] = useState<Product[]>([])
 	const [productQuantities, setProductQuantities] = useState<Record<string, number>>({})
-	const [confirmModalOpened, setConfirmModalOpened] = useState(false);
-	const [formValue, setFormValue] = useState<any | null>(null);
-	const [totalTax, setTotalTax] = useState(0);
-	const [discountType, setDiscountType] = useState('MMMK');
-	const [discountValue, setDiscountValue] = useState(0);
-	const [discountAmount, setDiscountAmount] = useState(0);
+	const [confirmModalOpened, setConfirmModalOpened] = useState(false)
+	const [formValue, setFormValue] = useState<FormValues | null>(null)
+	const [totalTax, setTotalTax] = useState(0)
+	const [discountType, setDiscountType] = useState('MMK')
+	const [discountValue, setDiscountValue] = useState(0)
+	const [discountAmount, setDiscountAmount] = useState(0)
+	const [scanText, setScanText] = useState('')
 
-	const [scanText, setScanText] = useState('');
-
-
-	const inputRef = useRef<HTMLInputElement>(null);
+	const inputRef = useRef<HTMLInputElement>(null)
 
 	useEffect(() => {
 		if (inputRef.current) {
-			inputRef.current.focus();
+			inputRef.current.focus()
 		}
-	}, []);
+	}, [])
 
 	const playNotificationSound = () => {
-		const audio = new Audio('/scan.mp3');
+		const audio = new Audio('/scan.mp3')
 		audio.play()
-	};
+	}
 
-	const [debouncedSearchQuery] = useDebouncedValue(searchQuery, 200);
+	const [debouncedSearchQuery] = useDebouncedValue(searchQuery, 200)
 
 	const { data, isLoading, refetch } = useGetProductVariationForVoucher({
 		pagination: {
@@ -98,8 +95,8 @@ export default function SaleVoucherPage() {
 			size: 100,
 		},
 		filters: {
-			search: debouncedSearchQuery
-		}
+			search: debouncedSearchQuery,
+		},
 	})
 
 	const updateProductsData = useCallback(() => {
@@ -107,50 +104,48 @@ export default function SaleVoucherPage() {
 			const products: Product[] = data.data.map((p) => ({
 				id: p.id || '',
 				code: p.code || '',
-				category: `${p.product?.brand?.name || ''} / ${p.product?.category.name || ''} / ${p.product?.subCategory.name || ''}`,
+				category: `${p.product?.brand?.name || ''} / ${p.product?.category.name || ''} / ${p.product?.subCategory.name || ''
+					}`,
 				name: `${p.product?.name || ''} / ${p.size?.name || ''} / ${p.color?.name || ''}`,
 				price: p.sellingPrice || 0,
-				image: p.image?.map((d) => {
-					return d.path
-				}) || []
-			}));
+				image: p.image?.map((d) => d.path) || [],
+			}))
 			setProductsData(products)
 		}
-	}, [data]);
+	}, [data])
 
 	useEffect(() => {
-		updateProductsData();
-
-	}, [updateProductsData]);
+		updateProductsData()
+	}, [updateProductsData])
 
 	useEffect(() => {
-		refetch();
-	}, [debouncedSearchQuery, refetch]);
+		refetch()
+	}, [debouncedSearchQuery, refetch])
 
-	const { control, handleSubmit, formState: { errors }, setValue } = useForm<FormValues>({
+	const { control, handleSubmit, formState: { errors }, setValue, watch } = useForm<FormValues>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
 			customerName: '',
 			customerPhone: '',
 			address: '',
 			taxRate: 0,
-			discountValue: 0
+			discountType: 'MMK',
+			discountValue: 0,
 		},
 	})
 
 	const handleAddToVoucher = (product: Product) => {
-		const existingProductIndex = voucher.findIndex(item => item.id === product.id)
+		const existingProductIndex = voucher.findIndex((item) => item.id === product.id)
 
 		if (existingProductIndex !== -1) {
-			// If product exists, update its quantity
 			const newQuantity = (productQuantities[product.id] || 1) + 1
 			handleQuantityChange(product.id, newQuantity)
 		} else {
-			// If product is new, add it to voucher with quantity 1
-			setVoucher(prev => [...prev, { ...product, qty: 1 }])
-			setProductQuantities(prev => ({ ...prev, [product.id]: 1 }))
+			setVoucher((prev) => [...prev, { ...product, qty: 1 }])
+			setProductQuantities((prev) => ({ ...prev, [product.id]: 1 }))
 		}
 	}
+
 	const handleRemoveFromVoucher = (productId: string) => {
 		setVoucher((prev) => prev.filter((item) => item.id !== productId))
 		setProductQuantities((prev) => {
@@ -177,79 +172,95 @@ export default function SaleVoucherPage() {
 		setTotalTax(subtotal * (e / 100))
 	}
 
+	const handleDiscountAmountChange = (value: number | undefined) => {
+		if (!value) value = 0
+
+		// Validate and cap the discount value based on type
+		if (discountType === 'PERCENTAGE') {
+			value = Math.min(value, 100) // Cap percentage at 100%
+			const calculatedDiscount = (value / 100) * subtotal
+			setDiscountAmount(calculatedDiscount)
+		} else {
+			value = Math.min(value, subtotal) // Cap MMK amount at subtotal
+			setDiscountAmount(value)
+		}
+
+		setDiscountValue(value)
+		setValue('discountValue', value)
+	}
+
+	const handleDiscountTypeChange = (type: string | null) => {
+		if (!type) return
+
+		setDiscountType(type)
+		// Reset discount value when changing type
+		setDiscountValue(0)
+		setDiscountAmount(0)
+		setValue('discountValue', 0)
+		setValue('discountType', type)
+	}
+
 	const onSubmit = (data: FormValues) => {
 		setFormValue(data)
-		setConfirmModalOpened(true);
-	};
+		setConfirmModalOpened(true)
+	}
 
 	const createInvoice = useCreateInvoice()
+
 	const handleConfirmedSubmit = () => {
-		const taxAmount = subtotal * (Number(control._formValues.taxRate) / 100)
-		const totalAmount = subtotal + taxAmount
+		if (!formValue) return
+
+		const taxAmount = subtotal * (Number(formValue.taxRate) / 100)
+		const finalTotal = subtotal - discountAmount + taxAmount
 
 		try {
-			createInvoice.mutate({
-				address: formValue?.address,
-				name: formValue?.customerName,
-				phone: formValue?.customerPhone,
-				note: formValue?.note,
-				grossPrice: totalAmount,
-				taxAmount: taxAmount,
-				variation: voucher.map((d) => {
-					const preProduct = productQuantities[d.id]
-					return {
-						qty: preProduct,
-						total: d.price * preProduct,
-						variationId: d.id
-					}
-				})
-			}, {
-				onSuccess: (response) => {
-					if (response._data) {
-						router.push(`/dashboard/invoice/details?id=${response._data.createdInvoiceId}`)
-					} else {
-						router.push(`/dashboard/invoice`)
-					}
+			createInvoice.mutate(
+				{
+					address: formValue.address,
+					name: formValue.customerName,
+					phone: formValue.customerPhone,
+					note: formValue.note,
+					grossPrice: finalTotal,
+					taxAmount: taxAmount,
+					// discountType: formValue.discountType,
+					// discountValue: formValue.discountValue,
+					// discountAmount: discountAmount,
+					variation: voucher.map((d) => ({
+						qty: productQuantities[d.id],
+						total: d.price * productQuantities[d.id],
+						variationId: d.id,
+					})),
+				},
+				{
+					onSuccess: (response) => {
+						if (response._data) {
+							router.push(`/dashboard/invoice/details?id=${response._data.createdInvoiceId}`)
+						} else {
+							router.push('/dashboard/invoice')
+						}
+					},
 				}
-			})
+			)
 		} catch (error) {
-			console.log(error)
+			console.error(error)
 		}
-		setConfirmModalOpened(false);
+		setConfirmModalOpened(false)
 	}
 
-	const closeConfirmModal = () => {
-		setConfirmModalOpened(false);
-	}
+	const taxRate = watch('taxRate')
+	const taxAmount = subtotal * (Number(taxRate) / 100)
+	const total = subtotal - discountAmount + taxAmount
 
-	const handleDiscountAmountChange = (value: number | undefined) => {
-		if (!value) value = 0;
-		if (discountType === 'PERCENTAGE') {
-			// Percentage discount calculation
-			setDiscountAmount((value / 100) * subtotal);
-		} else if (discountType === 'MMK') {
-			// Flat discount calculation
-			setDiscountAmount(value);
-		}
-		setValue('discountValue', value); // Update form state
-	};
-
-	const handleDiscountTypeChange = (type: string) => {
-		setDiscountType(type); // Update discount type
-		// Reset discount value based on the new type immediately
-		const updatedDiscountValue = 0; // Reset to 0 when the type changes
-		setDiscountAmount(updatedDiscountValue);
-		setValue('discountValue', updatedDiscountValue);
-	};
-	const total = (subtotal - discountAmount) * (1 + Number(control._formValues.taxRate) / 100);
 	return (
 		<AnimatedPageTransition>
 			<Container size="xl">
 				<form onSubmit={handleSubmit(onSubmit)}>
 					<Grid>
 						<Grid.Col span={{ base: 12, md: 8 }}>
-							<Card shadow="sm" radius="md" withBorder mb='md'>
-								<Text fw={500} size="lg">Barcode Scanner</Text>
+							<Card shadow="sm" radius="md" withBorder mb="md">
+								<Text fw={500} size="lg">
+									Barcode Scanner
+								</Text>
 								<Group>
 									<TextInput
 										leftSection={<IconSearch style={{ width: 18, height: 18 }} />}
@@ -270,7 +281,7 @@ export default function SaleVoucherPage() {
 									style={{ flexGrow: 1 }}
 								/>
 							</Group>
-							<Card shadow="sm" p="xs" radius="md" withBorder mb={'md'}>
+							<Card shadow="sm" p="xs" radius="md" withBorder mb="md">
 								<Text fw={500} size="lg" mb="sm">
 									Available Products
 								</Text>
@@ -286,26 +297,44 @@ export default function SaleVoucherPage() {
 											</tr>
 										</thead>
 										<tbody>
-											{isLoading ? <LoadingOverlay visible={true} /> : productsData.map((product) => (
-												<tr key={product.id}>
-													<td style={{ textAlign: 'center', padding: '1rem' }}>{product.code}</td>
-													<td style={{ textAlign: 'center', padding: '1rem' }}>{product.name}</td>
-													<td style={{ textAlign: 'center', padding: '1rem' }}>{product.category}</td>
-													<td style={{ textAlign: 'right', padding: '1rem' }}>
-														<Flex justify="flex-end" align="center">
-															<Text size="sm" mr={4}>Ks</Text>
-															<FormattedNumber value={Number(product.price.toFixed(2))} fw={600} />
-														</Flex>
-													</td>
-													<td style={{ textAlign: 'center', padding: '1rem' }}>
-														<Tooltip label="Add to Voucher">
-															<ActionIcon color="blue" onClick={() => handleAddToVoucher(product)}>
-																<IconPlus size={16} />
-															</ActionIcon>
-														</Tooltip>
+											{isLoading ? (
+												<tr>
+													<td colSpan={5}>
+														<LoadingOverlay visible={true} />
 													</td>
 												</tr>
-											))}
+											) : (
+												productsData.map((product) => (
+													<tr key={product.id}>
+														<td style={{ textAlign: 'center', padding: '1rem' }}>{product.code}</td>
+														<td style={{ textAlign: 'center', padding: '1rem' }}>{product.name}</td>
+														<td style={{ textAlign: 'center', padding: '1rem' }}>
+															{product.category}
+														</td>
+														<td style={{ textAlign: 'right', padding: '1rem' }}>
+															<Flex justify="flex-end" align="center">
+																<Text size="sm" mr={4}>
+																	Ks
+																</Text>
+																<FormattedNumber
+																	value={Number(product.price.toFixed(2))}
+																	fw={600}
+																/>
+															</Flex>
+														</td>
+														<td style={{ textAlign: 'center', padding: '1rem' }}>
+															<Tooltip label="Add to Voucher">
+																<ActionIcon
+																	color="blue"
+																	onClick={() => handleAddToVoucher(product)}
+																>
+																	<IconPlus size={16} />
+																</ActionIcon>
+															</Tooltip>
+														</td>
+													</tr>
+												))
+											)}
 										</tbody>
 									</Table>
 								</ScrollArea>
@@ -348,8 +377,6 @@ export default function SaleVoucherPage() {
 											)}
 										/>
 									</Grid.Col>
-								</Grid>
-								<Grid>
 									<Grid.Col span={6}>
 										<Controller
 											name="address"
@@ -380,9 +407,7 @@ export default function SaleVoucherPage() {
 								</Group>
 								<ScrollArea h={400} mb="md">
 									{voucher.length === 0 ? (
-										<Text mt="xl">
-											No products added to the voucher.
-										</Text>
+										<Text mt="xl">No products added to the voucher.</Text>
 									) : (
 										<Stack>
 											<AnimatePresence>
@@ -406,10 +431,66 @@ export default function SaleVoucherPage() {
 									<Flex justify="space-between">
 										<Text>Subtotal:</Text>
 										<Flex align="center">
-											<Text size="sm" mr={4}>Ks</Text>
+											<Text size="sm" mr={4}>
+												Ks
+											</Text>
 											<FormattedNumber value={Number(subtotal.toFixed(2))} fw={600} />
 										</Flex>
 									</Flex>
+
+									{/* Discount Section */}
+									<Flex direction="column" gap="xs">
+										<Flex justify="space-between" align="center">
+											<Controller
+												name="discountType"
+												control={control}
+												render={({ field }) => (
+													<Select
+														label="Discount Type"
+														placeholder="Select type"
+														value={discountType}
+														onChange={handleDiscountTypeChange}
+														data={[
+															{ value: 'MMK', label: 'MMK' },
+															{ value: 'PERCENTAGE', label: 'Percentage' },
+														]}
+														style={{ width: '120px' }}
+													/>
+												)}
+											/>
+											<Controller
+												name="discountValue"
+												control={control}
+												render={({ field }) => (
+													<NumberInput
+														label="Discount Value"
+														placeholder={`Enter ${discountType === 'PERCENTAGE' ? '%' : 'MMK'}`}
+														min={0}
+														max={discountType === 'PERCENTAGE' ? 100 : subtotal}
+														value={discountValue}
+														onChange={(value) => handleDiscountAmountChange(Number(value))}
+														error={errors.discountValue?.message}
+														style={{ width: '150px' }}
+													/>
+												)}
+											/>
+										</Flex>
+										{discountAmount > 0 && (
+											<Flex justify="space-between">
+												<Text size="sm" color="dimmed">
+													Discount Amount:
+												</Text>
+												<Flex align="center">
+													<Text size="sm" mr={4}>
+														Ks
+													</Text>
+													<FormattedNumber value={Number(discountAmount.toFixed(2))} />
+												</Flex>
+											</Flex>
+										)}
+									</Flex>
+
+									{/* Tax Section */}
 									<Flex justify="space-between" align="center">
 										<Controller
 											name="taxRate"
@@ -419,9 +500,9 @@ export default function SaleVoucherPage() {
 													label="Tax Rate"
 													placeholder="Select tax rate"
 													value={field.value.toString()}
-													onChange={(value: any) => {
-														handleChangeTax(value)
-														field.onChange(Number(value))
+													onChange={(value) => {
+														handleChangeTax(Number(value || 0))
+														field.onChange(Number(value || 0))
 													}}
 													error={errors.taxRate?.message}
 													data={[
@@ -435,58 +516,23 @@ export default function SaleVoucherPage() {
 											)}
 										/>
 										<Flex align="center">
-											<Text size="sm" mr={4}>Ks</Text>
-											<FormattedNumber value={Number((subtotal * (Number(control._formValues.taxRate) / 100)).toFixed(2))} fw={600} />
+											<Text size="sm" mr={4}>
+												Ks
+											</Text>
+											<FormattedNumber value={Number(taxAmount.toFixed(2))} fw={600} />
 										</Flex>
 									</Flex>
-									<Flex justify="space-between" align="center" mb="sm">
-										<Controller
-											name="discountType"
-											control={control}
-											render={({ field }) => (
-												<Select
-													label="Discount Type"
-													placeholder="Select discount type"
-													value={discountType}
-													onChange={(type) => {
-														if (type) {
-															setDiscountValue(0)
-															setDiscountAmount(0)
-															setValue('discountValue', 0)
-															handleDiscountTypeChange(type); // Update state
-															field.onChange(type); // Update React Hook Form
-														}
-													}}
-													data={[
-														{ value: 'MMK', label: 'Ks' },
-														{ value: 'PERCENTAGE', label: '%' },
-													]}
-													error={errors.discountType?.message}
-													style={{ width: '120px' }}
-												/>
-											)}
-										/>
-										<NumberInput
-											label="Discount Value"
-											placeholder="Enter discount"
-											min={0}
-											max={100}
-											value={formValue?.discountValue || 0}
-											onChange={(value) => {
-												handleDiscountAmountChange(parseFloat(value.toString()))
-											}}
-											error={errors.discountValue?.message}
-											style={{ flexGrow: 1 }}
-										/>
-									</Flex>
-
 								</Stack>
 								<Divider my="sm" />
 								<Flex justify="space-between" align="center">
-									<Text fw={500} size="lg">Total:</Text>
+									<Text fw={500} size="lg">
+										Total:
+									</Text>
 									<Flex align="center">
-										<Text size="sm" mr={4}>Ks</Text>
-										<FormattedNumber value={Number(total)} fw={600} size="lg" />
+										<Text size="sm" mr={4}>
+											Ks
+										</Text>
+										<FormattedNumber value={Number(total.toFixed(2))} fw={600} size="lg" />
 									</Flex>
 								</Flex>
 								<Button type="submit" fullWidth mt="md" disabled={voucher.length === 0}>
@@ -496,15 +542,18 @@ export default function SaleVoucherPage() {
 						</Grid.Col>
 					</Grid>
 				</form>
-				<Modal opened={confirmModalOpened} onClose={closeConfirmModal} title="Confirm Sale">
+				<Modal opened={confirmModalOpened} onClose={() => setConfirmModalOpened(false)} title="Confirm Sale">
 					<Text>Are you sure you want to complete this sale?</Text>
 					<Group mt="md">
-						<Button onClick={closeConfirmModal} variant="outline">Cancel</Button>
-						<Button onClick={handleConfirmedSubmit} color="blue">Confirm</Button>
+						<Button onClick={() => setConfirmModalOpened(false)} variant="outline">
+							Cancel
+						</Button>
+						<Button onClick={handleConfirmedSubmit} color="blue">
+							Confirm
+						</Button>
 					</Group>
 				</Modal>
 			</Container>
-		</AnimatedPageTransition >
+		</AnimatedPageTransition>
 	)
 }
-
