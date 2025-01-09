@@ -40,6 +40,7 @@ function InvoicePreview() {
 			refetch()
 		}
 	}, [invoiceId])
+	console.log(data)
 
 	const handlePrint = () => {
 		window.print();
@@ -137,7 +138,14 @@ function InvoicePreview() {
 							<Text color="dimmed">Subtotal:</Text>
 							<Flex align="center">
 								<Text size="sm" mr={4}>Ks</Text>
-								<FormattedNumber value={((data?.data.grossPrice || 0) - (data?.data.tax || 0)) || 0} fw={500} />
+								<FormattedNumber value={(data?.data.grossPrice || 0)} fw={500} />
+							</Flex>
+						</Flex>
+						<Flex justify="space-between">
+							<Text color="dimmed">Discount Price:</Text>
+							<Flex align="center">
+								<Text size="sm" mr={4}>Ks</Text>
+								<FormattedNumber value={data?.data.discountAmount || 0} fw={500} />
 							</Flex>
 						</Flex>
 						<Flex justify="space-between">

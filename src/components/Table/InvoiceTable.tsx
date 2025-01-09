@@ -77,6 +77,9 @@ export function InvoiceTable() {
 			{
 				accessorKey: "tax",
 				header: "Tax",
+				Cell: ({ row }) => (
+					<Text size="sm" fw={900}>{row.original.tax} Ks</Text>
+				),
 			},
 			{
 				accessorKey: "branch.name",

@@ -10,6 +10,7 @@ export interface Invoice {
 	customer: Customer;
 	grossPrice: number;
 	tax: number;
+	discountAmount: number;
 	note?: string;
 	createdAt: string;
 	actionedBy: User;

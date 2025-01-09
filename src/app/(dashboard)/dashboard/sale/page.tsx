@@ -73,7 +73,7 @@ export default function SaleVoucherPage() {
 	const [discountValue, setDiscountValue] = useState(0)
 	const [discountAmount, setDiscountAmount] = useState(0)
 	const [scanText, setScanText] = useState('')
-	const [currentScanProduct,setCurrentScanProduct] = useState<any>(null)
+	const [currentScanProduct, setCurrentScanProduct] = useState<any>(null)
 
 	const inputRef = useRef<HTMLInputElement>(null)
 
@@ -213,22 +213,6 @@ export default function SaleVoucherPage() {
 
 		const taxAmount = subtotal * (Number(formValue.taxRate) / 100)
 		const finalTotal = subtotal - discountAmount + taxAmount
-		console.log({
-			address: formValue.address,
-			name: formValue.customerName,
-			phone: formValue.customerPhone,
-			note: formValue.note,
-			grossPrice: finalTotal,
-			taxAmount: taxAmount,
-			discountType: formValue.discountType,
-			discountValue: formValue.discountValue,
-			discountAmount: discountAmount,
-			variation: voucher.map((d) => ({
-				qty: productQuantities[d.id],
-				total: d.price * productQuantities[d.id],
-				variationId: d.id,
-			})),
-		})
 		try {
 			createInvoice.mutate(
 				{
@@ -236,7 +220,8 @@ export default function SaleVoucherPage() {
 					name: formValue.customerName,
 					phone: formValue.customerPhone,
 					note: formValue.note,
-					grossPrice: finalTotal,
+					grossPrice: subtotal,
+					totalPrice: finalTotal,
 					taxAmount: taxAmount,
 					discountType: formValue.discountType,
 					discountValue: formValue.discountValue,
@@ -268,14 +253,14 @@ export default function SaleVoucherPage() {
 	const total = subtotal - discountAmount + taxAmount
 
 
-	const handleScan = async (text:string) =>{
+	const handleScan = async (text: string) => {
 		try {
 			if (!text?.trim()) return;
 			const trimmedText = text.trim();
 			setSearchQuery('');
 			setScanText(text)
 			console.log(text);
-			
+
 			const result = await refetch();
 			if (!result.data?.data) return;
 			const scannedProduct = result.data.data.find(p => p.code === trimmedText);
@@ -322,20 +307,20 @@ export default function SaleVoucherPage() {
 	return (
 		<AnimatedPageTransition>
 			<Container size="xl">
-			<Card shadow="sm" radius="md" withBorder mb="md">
-								<Text fw={500} size="lg">
-									Barcode Scanner
-								</Text>
-								<Group>
-									<TextInput
-										leftSection={<IconSearch style={{ width: 18, height: 18 }} />}
-										placeholder="Scan Here"
-										value={scanText}
-										ref={inputRef}
-										onChange={(e) => handleScan(e.target.value)}
-										style={{ flexGrow: 1 }}
-									/>
-								</Group>
+				<Card shadow="sm" radius="md" withBorder mb="md">
+					<Text fw={500} size="lg">
+						Barcode Scanner
+					</Text>
+					<Group>
+						<TextInput
+							leftSection={<IconSearch style={{ width: 18, height: 18 }} />}
+							placeholder="Scan Here"
+							value={scanText}
+							ref={inputRef}
+							onChange={(e) => handleScan(e.target.value)}
+							style={{ flexGrow: 1 }}
+						/>
+					</Group>
 				</Card>
 				<form onSubmit={handleSubmit(onSubmit)}>
 					<Grid>

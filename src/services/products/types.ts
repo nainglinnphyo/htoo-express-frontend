@@ -116,6 +116,7 @@ export interface createInvoicePayload {
 	grossPrice: number;
 	taxAmount: number;
 	discountType: string;
+	totalPrice: number;
 	discountValue: number;
 	discountAmount: number;
 	variation: {

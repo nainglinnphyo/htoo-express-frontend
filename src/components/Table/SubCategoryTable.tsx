@@ -48,6 +48,10 @@ export function SubCategoryTable() {
 				accessorKey: "description",
 				header: "Description",
 			},
+			{
+				accessorKey: "category.name",
+				header: "Category Name",
+			},
 		],
 		[]
 	);
