@@ -15,6 +15,9 @@ export interface Product {
 	variationCount?: number;
 	category: Category;
 	subCategory: SubCategory;
+	categoryId: string;
+	subCategoryId: string;
+	brandId: string;
 }
 
 export interface Size {
@@ -46,6 +49,7 @@ export interface ColorResponse {
 }
 
 export interface CreateProductPayload {
+	productId?: string;
 	code?: string;
 	name: string;
 	description: string;

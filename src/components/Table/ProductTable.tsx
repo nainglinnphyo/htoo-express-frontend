@@ -3,11 +3,12 @@
 import { Paper, Title, Space, Pagination, Select, TextInput, Group, ActionIcon, Menu } from "@mantine/core";
 import { MantineReactTable, useMantineReactTable, type MRT_ColumnDef } from "mantine-react-table";
 import { useEffect, useMemo, useState } from "react";
-import { useDebouncedValue } from "@mantine/hooks";
+import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { useFetchProduct } from "@/services/products";
 import { Product } from "@/services/products/types";
 import { IconEdit, IconTrash } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
+import { ProductEditModal } from "../Product/ProductEditModel";
 
 export function ProductTable() {
 	const router = useRouter()
@@ -16,7 +17,8 @@ export function ProductTable() {
 		pageSize: 10,
 	});
 
-
+	const [openedEdit, { open: openEdit, close: closeEdit }] = useDisclosure(false);
+	const [selectedRow, setSelectedRow] = useState<Product | null>(null);
 
 	const [searchQuery, setSearchQuery] = useState('');
 	// Custom hook to fetch data using pagination, sorting, and filtering
@@ -71,6 +73,7 @@ export function ProductTable() {
 				accessorKey: "variationCount",
 				header: "Variation Count",
 			},
+
 		],
 		[]
 	);
@@ -80,10 +83,12 @@ export function ProductTable() {
 	const rowCount = data?.totalCount ?? 0;
 	const pageCount = Math.ceil(rowCount / pagination.pageSize);
 
-	// const handleEdit = (rowData) => {
-	// 	console.log('Editing row:', rowData);
-	// 	// Add your edit logic here
-	// };
+	const handleEdit = (rowData: any) => {
+		console.log('Editing row:', rowData);
+		setSelectedRow(rowData)
+		openEdit()
+		// Add your edit logic here
+	};
 
 	// const handleDelete = (id) => {
 	// 	console.log('Deleting row with ID:', id);
@@ -102,8 +107,8 @@ export function ProductTable() {
 		positionActionsColumn: 'last',
 		renderRowActionMenuItems: ({ row }) => (
 			<>
-				<Menu.Item onClick={() => router.push(`/dashboard/product/variation/add?productId=${row.original.id}`)}>
-					Export Code
+				<Menu.Item onClick={() => handleEdit(row.original)}>
+					Edit
 				</Menu.Item >
 				<Menu.Item onClick={() => router.push(`/dashboard/product/variation/add?productId=${row.original.id}`)}>
 					Add Variation
@@ -122,6 +127,7 @@ export function ProductTable() {
 				onChange={handleSearchChange}
 				style={{ marginBottom: '20px' }}
 			/>
+			{selectedRow && <ProductEditModal opened={openedEdit} close={closeEdit} product={selectedRow} refetch={refetch} />}
 			<MantineReactTable
 				table={table}
 			/>

@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { StockAdjust } from "../Product/StockAdjustModel";
 import { VariationEditModel } from "../Product/VariationEditModel";
 import useAuthStore from "@/store/authStore";
+import { BarcodeModel } from "../Product/BarcodeModel";
 
 export function VariationDetailsTable({ product, isProductLoading, sizeId }: { product?: Product, isProductLoading: boolean, sizeId: string }) {
 	const router = useRouter()
@@ -20,6 +21,7 @@ export function VariationDetailsTable({ product, isProductLoading, sizeId }: { p
 
 	const [opened, { open, close }] = useDisclosure(false);
 	const [openedEdit, { open: openEdit, close: closeEdit }] = useDisclosure(false);
+	const [openedBarcode, { open: openBarcode, close: closeBarcode }] = useDisclosure(false);
 
 	const { user } = useAuthStore()
 
@@ -160,6 +162,10 @@ export function VariationDetailsTable({ product, isProductLoading, sizeId }: { p
 		openEdit()
 	};
 
+	const openBarcodeModel = (row: any) => {
+		setSelectedRow(row);
+		openBarcode()
+	};
 
 	const table = useMantineReactTable({
 		columns,
@@ -177,6 +183,7 @@ export function VariationDetailsTable({ product, isProductLoading, sizeId }: { p
 		columnResizeMode: 'onEnd',
 		renderRowActionMenuItems: ({ row }) => (
 			<>
+				<Menu.Item onClick={() => openBarcodeModel(row.original)}>Export Barcode</Menu.Item >
 				<Menu.Item onClick={() => openEdtModal(row.original)}>Edit</Menu.Item >
 				<Menu.Item onClick={() => openModal(row.original)}>Adjust Stock</Menu.Item >
 			</>
@@ -193,6 +200,7 @@ export function VariationDetailsTable({ product, isProductLoading, sizeId }: { p
 				onChange={handleSearchChange}
 				style={{ marginBottom: '20px' }}
 			/>
+			{selectedRow && <BarcodeModel opened={openedBarcode} close={closeBarcode} currentRow={selectedRow} />}
 			{selectedRow && <StockAdjust opened={opened} close={close} currentRow={selectedRow} />}
 			{selectedRow && <VariationEditModel opened={openedEdit} close={closeEdit} currentRow={selectedRow} refetch={refetch} />}
 			<MantineReactTable

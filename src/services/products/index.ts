@@ -71,15 +71,6 @@ export const useFetchColor = () =>
 		placeholderData: keepPreviousData,
 	});
 
-const createProduct = async (payload: CreateProductPayload) => {
-	const response = await axios.post(
-		"product",
-		{ ...payload },
-		{ headers: authJsonHeader() }
-	);
-	return response.data;
-};
-
 const uploadImage = async (payload: { image: String }) => {
 	console.log(payload);
 	const response = await axios.post(
@@ -108,6 +99,15 @@ export const useUploadImage = () => {
 			});
 		},
 	});
+};
+
+const createProduct = async (payload: CreateProductPayload) => {
+	const response = await axios.post(
+		"product",
+		{ ...payload },
+		{ headers: authJsonHeader() }
+	);
+	return response.data;
 };
 
 export const useCreateProduct = () => {
@@ -515,6 +515,35 @@ export const useUpdateProductVariation = () => {
 					position: "bottom-right",
 				});
 				queryClient.invalidateQueries({ queryKey: ["product-variation"] });
+			}
+		},
+		onError: (e: any) => {
+			toast.error(e.response.data._metadata.message, {
+				position: "bottom-right",
+			});
+		},
+	});
+};
+
+const editProduct = async (payload: CreateProductPayload) => {
+	const response = await axios.put(
+		"product",
+		{ ...payload },
+		{ headers: authJsonHeader() }
+	);
+	return response.data;
+};
+
+export const useEditProduct = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: (payload: CreateProductPayload) => editProduct(payload),
+		onSuccess: (data) => {
+			if (data) {
+				toast.success(data._metadata.message, {
+					position: "bottom-right",
+				});
+				queryClient.invalidateQueries({ queryKey: ["product"] });
 			}
 		},
 		onError: (e: any) => {

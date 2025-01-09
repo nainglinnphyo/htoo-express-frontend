@@ -182,7 +182,6 @@ export function VariationEditModel({ opened, close, currentRow, refetch }: Varia
 			}
 		);
 	};
-	console.log({ previews })
 	return (
 		<Modal opened={opened} onClose={close} title="Edit Product Variation" size="lg">
 			<form onSubmit={handleSubmit(onSubmit)}>
