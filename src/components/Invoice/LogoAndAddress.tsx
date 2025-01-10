@@ -6,16 +6,16 @@ export function LogoAndAddress() {
 			<Image
 				src="/static/images/Htoo.png"
 				alt="Company Logo"
-				width={80}
-				height={80}
+				width={70}
+				height={70}
 				fit="contain"
-				mb="md"
+				mb="sm"
 			/>
 			<Stack ta="center" w="100%">
-				<Text fw={700}>Htoo Export Fashion</Text>
-				<Text size="sm">NO(940) Thitsar Street, South Okkalapa</Text>
-				<Text size="sm">Phone: (+959) 123456789</Text>
-				<Text size="sm">Email: info@htooexport.com</Text>
+				<Text fw={900} size="md">Htoo Export Fashion</Text>
+				<Text fw={900} size="sm">NO(940) Thitsar Street, South Okkalapa</Text>
+				<Text fw={900} size="sm">Phone: (+959) 123456789</Text>
+				<Text fw={900} size="sm">Email: info@htooexport.com</Text>
 			</Stack>
 		</Box>
 	)
