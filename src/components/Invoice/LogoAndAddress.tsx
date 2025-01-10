@@ -2,7 +2,7 @@ import { Box, Image, Text, Stack } from '@mantine/core'
 
 export function LogoAndAddress() {
 	return (
-		<Box className="logo-and-address print-only" ta="center" mb="md" style={{ maxWidth: '300px', margin: '0 auto', alignItems: 'center' }}>
+		<Box className="logo-and-address" ta="center" mb="md" style={{ maxWidth: '300px', margin: '0 auto', alignItems: 'center' }}>
 			<Image
 				src="/static/images/Htoo.png"
 				alt="Company Logo"
@@ -13,10 +13,9 @@ export function LogoAndAddress() {
 			/>
 			<Stack ta="center" w="100%">
 				<Text fw={700}>Htoo Export Fashion</Text>
-				<Text size="sm">123 Business Street, Suite 100</Text>
-				<Text size="sm">Cityville, State 12345</Text>
-				<Text size="sm">Phone: (555) 123-4567</Text>
-				<Text size="sm">Email: info@yourcompany.com</Text>
+				<Text size="sm">NO(940) Thitsar Street, South Okkalapa</Text>
+				<Text size="sm">Phone: (+959) 123456789</Text>
+				<Text size="sm">Email: info@htooexport.com</Text>
 			</Stack>
 		</Box>
 	)

@@ -1,35 +1,73 @@
 @media print {
-	.no-print {
-		display: none !important;
+	@page {
+		size: 80mm 297mm;
+		margin: 0;
 	}
 
-	body * {
-		visibility: hidden;
+	body {
+		width: 80mm;
+		margin: 0;
+		padding: 0;
 	}
 
-	.invoice-container,
+	.invoice-container {
+		width: 72mm; /* Allowing for some margin */
+		padding: 2mm;
+		font-size: 8pt;
+		line-height: 1.2;
+	}
+
 	.invoice-container * {
 		visibility: visible;
 	}
 
-	.invoice-container {
-		position: absolute;
-		left: 0;
-		top: 0;
-		width: 100%;
+	.no-print {
+		display: none !important;
 	}
 
-	.print-only {
-		display: block !important;
-		visibility: visible !important;
+	.invoice-container .mantine-Card-root,
+	.invoice-container .mantine-Paper-root {
+		padding: 0 !important;
+		box-shadow: none !important;
+		border: none !important;
+	}
+
+	.invoice-container .mantine-Table-root {
+		font-size: 7pt;
+	}
+
+	.invoice-container .mantine-Title-root {
+		font-size: 10pt !important;
+	}
+
+	.invoice-container .mantine-Text-root {
+		font-size: 8pt !important;
+	}
+
+	.invoice-container .mantine-Stack-root > * {
+		margin-bottom: 1mm !important;
 	}
 
 	.logo-and-address {
 		text-align: center;
-		margin-bottom: 2rem;
+		margin-bottom: 2mm;
+	}
+
+	.customer-info .mantine-Grid-col {
+		width: 100% !important;
+		max-width: 100% !important;
 	}
 }
 
 .print-only {
 	display: none;
+}
+
+@media screen {
+	.invoice-container {
+		max-width: 80mm;
+		margin: 0 auto;
+		font-size: 8pt;
+		line-height: 1.2;
+	}
 }
