@@ -69,7 +69,7 @@ function InvoicePreview() {
 								flexDirection: "column",
 							}}
 						>
-							<span className="text-sm mb-1" style={{ fontSize: '10px' }}>Ks {c.price}</span>
+							<span className="text-sm mb-1" style={{ fontSize: '8px' }}>Ks {c.price}</span>
 							<Barcode
 								value={c.code}
 								width={0.7}
@@ -78,7 +78,7 @@ function InvoicePreview() {
 								displayValue={false}
 								fontSize={10}
 							/>
-							<span className=" mb-1" style={{ fontSize: '10px' }}>{c.category}</span>
+							<span className=" mb-1" style={{ fontSize: '8px' }}>{c.category}</span>
 						</div>
 					</Grid.Col>
 				))}
