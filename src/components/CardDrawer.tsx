@@ -31,6 +31,7 @@ export function CartDrawer({ opened, close }: { opened: boolean, close: () => vo
 	}
 
 	const handleGenerate = () => {
+		toggleCart()
 		window.location.assign(`https://htooexpress.vercel.app/dashboard/print`)
 	}
 
