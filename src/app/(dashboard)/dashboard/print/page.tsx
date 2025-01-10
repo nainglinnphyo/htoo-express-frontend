@@ -34,6 +34,7 @@ function InvoicePreview() {
 				})
 			})
 		}
+		// setCartItem(i)
 		if (items.reduce((a, b) => a + b.quantity, 0) === 21) {
 			setCartItem(i)
 		} else {
@@ -44,7 +45,7 @@ function InvoicePreview() {
 
 	return (
 		// h={`${2 * cartItem.length}cm`}
-		<Container className="invoice-container" w={'14cm'} bg={'indigo'}>
+		<Container className="invoice-container" w={'14cm'}>
 			<div className="no-print">
 				<Button
 					leftSection={<IconPrinter size={14} />}
@@ -56,9 +57,9 @@ function InvoicePreview() {
 					Print
 				</Button>
 			</div>
-			<SimpleGrid bg={'red'} cols={3} style={{ justifyContent: "center", alignItems: 'center' }}>
+			<SimpleGrid cols={3} style={{ justifyContent: "center", alignItems: 'center' }}>
 				{cartItem.map((c, index) => (
-					<div style={{ justifyItems: "center", background: "green" }}>
+					<div style={{ justifyItems: "center", marginTop: index >= 0 && index <= 2 ? 10 : index > 2 && index <= 5 ? 12 : index > 14 && index <= 17 ? 16 : index > 17 && index <= 20 ? 18 : 14, marginBottom: 18 }}>
 						<div
 							key={index}
 							style={{
@@ -67,10 +68,10 @@ function InvoicePreview() {
 								flexDirection: "column",
 							}}
 						>
-							<span className="text-sm mb-1" style={{ fontSize: '8px' }}>Ks {c.price}</span>
+							<span className="text-sm mb-1" style={{ fontSize: '8px' }}>Ks {c.price} / {index} / {index >= 0 && index <= 2 ? 10 : index > 2 && index <= 5 ? 12 : index > 14 && index <= 16 ? 16 : index > 18 && index <= 20 ? 18 : 14}</span>
 							<Barcode
 								value={c.code}
-								width={0.75}
+								width={0.8}
 								height={24}
 								margin={0}
 								displayValue={false}
