@@ -43,7 +43,7 @@ export function CartDrawer({ opened, close }: { opened: boolean, close: () => vo
 		if (isNaN(price) || price < 0) {
 			const item = items.find((item) => item.code === code)
 			if (item) {
-				setPrices((prev) => ({ ...prev, [code]: item.quantity.toString() }))
+				setPrices((prev) => ({ ...prev, [code]: item.price.toString() }))
 			}
 		}
 	}
