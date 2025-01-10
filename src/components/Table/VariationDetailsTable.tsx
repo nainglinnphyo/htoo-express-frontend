@@ -1,6 +1,6 @@
 "use client";
 
-import { Paper, Title, Space, Pagination, Select, TextInput, Group, ActionIcon, Menu, Badge, Skeleton, ColorSwatch, Box, LoadingOverlay, Image, Text } from "@mantine/core";
+import { Paper, Title, Space, Pagination, Select, TextInput, Group, Drawer, ActionIcon, Menu, Badge, Skeleton, ColorSwatch, Box, LoadingOverlay, Image, Text } from "@mantine/core";
 import { MantineReactTable, useMantineReactTable, type MRT_ColumnDef } from "mantine-react-table";
 import { useEffect, useMemo, useState } from "react";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
@@ -11,6 +11,8 @@ import { StockAdjust } from "../Product/StockAdjustModel";
 import { VariationEditModel } from "../Product/VariationEditModel";
 import useAuthStore from "@/store/authStore";
 import { BarcodeModel } from "../Product/BarcodeModel";
+import { CartDrawer } from "../CardDrawer";
+import { useCartStore } from "@/store/barcodeStore";
 
 export function VariationDetailsTable({ product, isProductLoading, sizeId }: { product?: Product, isProductLoading: boolean, sizeId: string }) {
 	const router = useRouter()
@@ -19,9 +21,13 @@ export function VariationDetailsTable({ product, isProductLoading, sizeId }: { p
 		pageSize: 5,
 	});
 
+	const [barCodeItem, setBarCodeItem] = useState<any>([]);
+
 	const [opened, { open, close }] = useDisclosure(false);
 	const [openedEdit, { open: openEdit, close: closeEdit }] = useDisclosure(false);
 	const [openedBarcode, { open: openBarcode, close: closeBarcode }] = useDisclosure(false);
+
+	const { addItem } = useCartStore()
 
 	const { user } = useAuthStore()
 
@@ -167,6 +173,24 @@ export function VariationDetailsTable({ product, isProductLoading, sizeId }: { p
 		openBarcode()
 	};
 
+	const handleAddToBarCodeList = (row: any) => {
+		// setBarCodeItem()
+		const code = row.code;
+		const price = row.sellingPrice;
+		const quantity = row.quantity;
+		const category = `${row.product.category.name} / ${row.product.brand.name}`
+		addItem({
+			code,
+			price, quantity, category
+		})
+		localStorage.setItem('barCodeItem', JSON.stringify({
+			code,
+			price,
+			quantity,
+			category
+		}))
+		console.log(JSON.parse(JSON.stringify(localStorage.getItem('barCodeItem'))))
+	};
 	const table = useMantineReactTable({
 		columns,
 		data: data?.variation ?? [],
@@ -183,6 +207,7 @@ export function VariationDetailsTable({ product, isProductLoading, sizeId }: { p
 		columnResizeMode: 'onEnd',
 		renderRowActionMenuItems: ({ row }) => (
 			<>
+				<Menu.Item onClick={() => handleAddToBarCodeList(row.original)}>Add To Barcode</Menu.Item >
 				<Menu.Item onClick={() => openBarcodeModel(row.original)}>Export Barcode</Menu.Item >
 				<Menu.Item onClick={() => openEdtModal(row.original)}>Edit</Menu.Item >
 				<Menu.Item onClick={() => openModal(row.original)}>Adjust Stock</Menu.Item >
@@ -203,6 +228,7 @@ export function VariationDetailsTable({ product, isProductLoading, sizeId }: { p
 			{selectedRow && <BarcodeModel opened={openedBarcode} close={closeBarcode} currentRow={selectedRow} />}
 			{selectedRow && <StockAdjust opened={opened} close={close} currentRow={selectedRow} />}
 			{selectedRow && <VariationEditModel opened={openedEdit} close={closeEdit} currentRow={selectedRow} refetch={refetch} />}
+
 			<MantineReactTable
 				table={table}
 			/>

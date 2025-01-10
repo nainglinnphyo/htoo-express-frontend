@@ -86,10 +86,10 @@ function InvoicePreview() {
 								<td>{product.productVariation.product?.name} {product.productVariation.size?.name} {product.productVariation.color?.name}</td>
 								<td style={{ textAlign: 'right' }}>{product.quantity}</td>
 								<td style={{ textAlign: 'right' }}>
-									<Text className='important-font'> {product.perPrice / product.quantity}</Text>
+									<Text className='important-font'> {product.perPrice}</Text>
 								</td>
 								<td style={{ textAlign: 'right' }}>
-									<Text className='important-font'> {(product.perPrice / product.quantity) * product.quantity} </Text>
+									<Text className='important-font'> {(product.perPrice) * product.quantity} </Text>
 								</td>
 							</tr>
 						))}
