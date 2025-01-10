@@ -11,17 +11,10 @@ import {
 import { IconPrinter } from '@tabler/icons-react'
 import Barcode from 'react-barcode'
 import './print.css'
-import { useSearchParams } from 'next/navigation'
 import { useCartStore } from '@/store/barcodeStore'
 
 
 function InvoicePreview() {
-	// const searchParams = useSearchParams()
-	// const code = searchParams.get("code") || "";
-	// const price = searchParams.get("price") || "";
-	// const category = searchParams.get("category") || "";
-	// const count = parseInt(searchParams.get("count")?.toString() || '') || 0;
-
 	const [cartItem, setCartItem] = useState<{ code: string, price: number, category: string }[]>([])
 	const { items } = useCartStore()
 	const handlePrint = () => {
@@ -45,7 +38,7 @@ function InvoicePreview() {
 
 	return (
 		// h={`${2 * cartItem.length}cm`}
-		<Container className="invoice-container" w={'14cm'}>
+		<Container className="invoice-container" w={'14cm'} mt={180}>
 			<div className="no-print">
 				<Title order={3}>Invoice Preview</Title>
 				<Text size="sm" mb="sm" fw={900}>Invoice ID</Text>

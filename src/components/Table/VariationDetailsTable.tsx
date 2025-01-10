@@ -178,7 +178,7 @@ export function VariationDetailsTable({ product, isProductLoading, sizeId }: { p
 		const code = row.code;
 		const price = row.sellingPrice;
 		const quantity = row.quantity;
-		const category = `${row.product.category.name} / ${row.product.brand.name}`
+		const category = `${row.product.subCategory.name} / ${row.product.brand.name}`
 		addItem({
 			code,
 			price, quantity, category
