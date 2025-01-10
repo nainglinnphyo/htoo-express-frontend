@@ -5,6 +5,7 @@ import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import {
+	Image,
 	Button,
 	Container,
 	Grid,
@@ -96,7 +97,7 @@ export default function SaleVoucherPage() {
 			size: 100,
 		},
 		filters: {
-			search: debouncedSearchQuery,
+			search: debouncedSearchQuery || scanText,
 		},
 	})
 
@@ -257,14 +258,11 @@ export default function SaleVoucherPage() {
 		try {
 			if (!text?.trim()) return;
 			const trimmedText = text.trim();
-			setSearchQuery('');
 			setScanText(text)
-			console.log(text);
-
+			if (trimmedText.length < 14) return null;
 			const result = await refetch();
 			if (!result.data?.data) return;
 			const scannedProduct = result.data.data.find(p => p.code === trimmedText);
-			console.log({ scannedProduct })
 			if (scannedProduct) {
 				const product = {
 					id: scannedProduct.id || '',
@@ -299,6 +297,7 @@ export default function SaleVoucherPage() {
 				playNotificationSound()
 				setScanText('')
 			}
+			setScanText('')
 		} catch (error) {
 			console.error('Error processing scanned product:', error);
 		}
@@ -374,6 +373,49 @@ export default function SaleVoucherPage() {
 																	fw={600}
 																/>
 															</Flex>
+														</td>
+														<td>
+															{product.image && product.image.length > 0 && (
+																product.image.map((d: any) => (
+																	<Image
+																		style={{ cursor: "pointer" }}
+																		src={d}
+																		alt=""
+																		radius="md"
+																		fit="contain"
+																		height={50}
+																		width={50}
+																		onClick={() => {
+																			const modal = document.createElement('div');
+																			modal.style.position = 'fixed';
+																			modal.style.top = '0';
+																			modal.style.left = '0';
+																			modal.style.width = '100%';
+																			modal.style.height = '100%';
+																			modal.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+																			modal.style.display = 'flex';
+																			modal.style.justifyContent = 'center';
+																			modal.style.alignItems = 'center';
+																			modal.style.zIndex = '1000';
+
+																			const modalImage: any = document.createElement('img');
+																			modalImage.src = d;
+																			modalImage.alt = d;
+																			modalImage.style.maxWidth = '90%';
+																			modalImage.style.maxHeight = '90%';
+
+																			modal.appendChild(modalImage);
+																			document.body.appendChild(modal);
+
+																			modal.addEventListener('click', () => {
+																				document.body.removeChild(modal);
+																			});
+																		}}
+																	/>
+																))
+															)
+
+															}
 														</td>
 														<td style={{ textAlign: 'center', padding: '1rem' }}>
 															<Tooltip label="Add to Voucher">
@@ -607,6 +649,6 @@ export default function SaleVoucherPage() {
 					</Group>
 				</Modal>
 			</Container>
-		</AnimatedPageTransition>
+		</AnimatedPageTransition >
 	)
 }
