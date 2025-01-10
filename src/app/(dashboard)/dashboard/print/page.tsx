@@ -6,7 +6,8 @@ import {
 	Text,
 	Title,
 	Button,
-	Grid
+	Grid,
+	SimpleGrid
 } from '@mantine/core'
 import { IconPrinter } from '@tabler/icons-react'
 import Barcode from 'react-barcode'
@@ -33,15 +34,18 @@ function InvoicePreview() {
 				})
 			})
 		}
-		setCartItem(i)
+		if (items.reduce((a, b) => a + b.quantity, 0) === 21) {
+			setCartItem(i)
+		} else {
+			setCartItem([])
+		}
+
 	}, [items])
 
 	return (
 		// h={`${2 * cartItem.length}cm`}
-		<Container className="invoice-container" w={'14cm'} mt={180}>
+		<Container className="invoice-container" w={'14cm'} bg={'indigo'}>
 			<div className="no-print">
-				<Title order={3}>Invoice Preview</Title>
-				<Text size="sm" mb="sm" fw={900}>Invoice ID</Text>
 				<Button
 					leftSection={<IconPrinter size={14} />}
 					onClick={handlePrint}
@@ -52,9 +56,9 @@ function InvoicePreview() {
 					Print
 				</Button>
 			</div>
-			<Grid mt={18} justify='center'>
+			<SimpleGrid bg={'red'} cols={3} style={{ justifyContent: "center", alignItems: 'center' }}>
 				{cartItem.map((c, index) => (
-					<Grid.Col span={3} style={{ height: '1.8cm', width: '2.8cm', justifyItems: "center", margin: '15px' }}>
+					<div style={{ justifyItems: "center", background: "green" }}>
 						<div
 							key={index}
 							style={{
@@ -66,7 +70,7 @@ function InvoicePreview() {
 							<span className="text-sm mb-1" style={{ fontSize: '8px' }}>Ks {c.price}</span>
 							<Barcode
 								value={c.code}
-								width={0.7}
+								width={0.75}
 								height={24}
 								margin={0}
 								displayValue={false}
@@ -74,12 +78,9 @@ function InvoicePreview() {
 							/>
 							<span className=" mb-1" style={{ fontSize: '8px' }}>{c.category}</span>
 						</div>
-					</Grid.Col>
+					</div>
 				))}
-				{/* <Grid.Col span={4}>1</Grid.Col>
-					<Grid.Col span={4}>2</Grid.Col>
-					<Grid.Col span={4}>3</Grid.Col> */}
-			</Grid>
+			</SimpleGrid>
 
 
 

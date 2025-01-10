@@ -62,9 +62,7 @@ function InvoicePreview() {
 
 			<motion.div initial="hidden" animate="visible" variants={fadeIn}>
 				<LogoAndAddress />
-
 				<Divider my="xs" />
-
 				<Stack className='no-print'>
 					<Text size="sm" fw={900}><strong>Customer:</strong> {data?.data.customer?.name}</Text>
 					<Text size="sm" fw={900}><strong>Phone:</strong> {data?.data.customer?.phone}</Text>
