@@ -16,6 +16,7 @@ interface CartStore {
 	addItem: (item: CartItem) => void;
 	removeItem: (id: string) => void;
 	updateQuantity: (id: string, quantity: number) => void;
+	updatePrice: (id: string, price: number) => void;
 	toggleCart: () => void;
 }
 
@@ -48,6 +49,13 @@ export const useCartStore = create(
 						item.code === id
 							? { ...item, quantity: Math.max(0, quantity) }
 							: item
+					),
+				})),
+
+			updatePrice: (id, price) =>
+				set((state) => ({
+					items: state.items.map((item) =>
+						item.code === id ? { ...item, price: Math.max(0, price) } : item
 					),
 				})),
 			toggleCart: () => set((state) => ({ isOpen: !state.isOpen })),

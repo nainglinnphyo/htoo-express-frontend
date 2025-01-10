@@ -13,6 +13,7 @@ import { IconPrinter } from '@tabler/icons-react'
 import Barcode from 'react-barcode'
 import './print.css'
 import { useCartStore } from '@/store/barcodeStore'
+import { FormattedNumber } from '@/components/Text/NumberFormatter'
 
 
 function InvoicePreview() {
@@ -66,12 +67,16 @@ function InvoicePreview() {
 								pageBreakInside: 'avoid',
 								display: 'flex',
 								flexDirection: "column",
+								justifyContent: 'start'
 							}}
 						>
-							<span className="text-sm mb-1" style={{ fontSize: '8px' }}>Ks {c.price} / {index} / {index >= 0 && index <= 2 ? 10 : index > 2 && index <= 5 ? 12 : index > 14 && index <= 16 ? 16 : index > 18 && index <= 20 ? 18 : 14}</span>
+							<div className="mb-1" style={{ display: "flex", alignItems: 'center' }}>
+								<span style={{ fontSize: 10 }}>Ks &nbsp;</span>
+								<FormattedNumber value={c.price} />
+							</div>
 							<Barcode
 								value={c.code}
-								width={0.8}
+								width={0.7}
 								height={24}
 								margin={0}
 								displayValue={false}

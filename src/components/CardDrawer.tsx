@@ -7,8 +7,9 @@ import { IconX, IconShoppingCart } from '@tabler/icons-react'
 import { useState } from "react"
 
 export function CartDrawer({ opened, close }: { opened: boolean, close: () => void }) {
-	const { items, toggleCart, removeItem, updateQuantity } = useCartStore()
+	const { items, toggleCart, removeItem, updateQuantity, updatePrice } = useCartStore()
 	const [quantities, setQuantities] = useState<Record<string, string>>({})
+	const [prices, setPrices] = useState<Record<string, string>>({})
 
 	const total = items.reduce((acc, item) => acc + item.price * item.quantity, 0)
 
@@ -20,12 +21,29 @@ export function CartDrawer({ opened, close }: { opened: boolean, close: () => vo
 		}
 	}
 
+	const handlePriceChange = (code: string, value: string) => {
+		setPrices((prev) => ({ ...prev, [code]: value }))
+		const price = parseInt(value)
+		if (!isNaN(price)) {
+			updatePrice(code, price)
+		}
+	}
+
 	const handleBlur = (code: string) => {
 		const quantity = parseInt(quantities[code])
 		if (isNaN(quantity) || quantity < 0) {
 			const item = items.find((item) => item.code === code)
 			if (item) {
 				setQuantities((prev) => ({ ...prev, [code]: item.quantity.toString() }))
+			}
+		}
+	}
+	const handleBlurPrice = (code: string) => {
+		const price = parseInt(prices[code])
+		if (isNaN(price) || price < 0) {
+			const item = items.find((item) => item.code === code)
+			if (item) {
+				setPrices((prev) => ({ ...prev, [code]: item.quantity.toString() }))
 			}
 		}
 	}
@@ -78,6 +96,17 @@ export function CartDrawer({ opened, close }: { opened: boolean, close: () => vo
 									value={quantities[item.code] ?? item.quantity}
 									onChange={(e) => handleQuantityChange(item.code, e?.toString() || '')}
 									onBlur={() => handleBlur(item.code)}
+									size="sm"
+									style={{ width: 80 }}
+								/>
+							</Group>
+							<Group >
+								<Text size="sm">Price:</Text>
+								<NumberInput
+									min={0}
+									value={quantities[item.code] ?? item.price}
+									onChange={(e) => handlePriceChange(item.code, e?.toString() || '')}
+									onBlur={() => handleBlurPrice(item.code)}
 									size="sm"
 									style={{ width: 80 }}
 								/>
