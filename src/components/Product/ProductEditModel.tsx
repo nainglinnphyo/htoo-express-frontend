@@ -42,7 +42,6 @@ export function ProductEditModal({ opened, close, product }: ProductEditModalPro
 
 	const updateProduct = useEditProduct();
 	const onSubmit = (data: CreateProductPayload) => {
-		console.log({ data })
 		updateProduct.mutate(
 			{ ...data, productId: product.id },
 			{

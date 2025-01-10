@@ -18,8 +18,8 @@ function InvoicePreview() {
 	const searchParams = useSearchParams()
 	const code = searchParams.get("code") || "";
 	const price = searchParams.get("price") || "";
+	const category = searchParams.get("category") || "";
 	const count = parseInt(searchParams.get("count")?.toString() || '') || 0;
-	console.log({ count })
 	const handlePrint = () => {
 		window.print()
 	}
@@ -45,22 +45,21 @@ function InvoicePreview() {
 						<div
 							key={index}
 							style={{
-								// width: '4.66cm',
-								// height: '4.66cm',
 								pageBreakInside: 'avoid',
 								display: 'flex',
 								flexDirection: "column",
 							}}
 						>
-							<span className="text-sm mb-1">Ks {price}</span>
+							<span className="text-sm mb-1" style={{ fontSize: '10px' }}>Ks {price}</span>
 							<Barcode
 								value={code}
 								width={1}
 								height={24}
 								margin={0}
-								displayValue={true}
+								displayValue={false}
 								fontSize={10}
 							/>
+							<span className=" mb-1" style={{ fontSize: '10px' }}>{category}</span>
 						</div>
 					</Grid.Col>
 				))}

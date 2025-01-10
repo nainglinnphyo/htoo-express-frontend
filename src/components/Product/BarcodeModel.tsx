@@ -37,8 +37,7 @@ export function BarcodeModel({ opened, close, currentRow }: ProductModelProps) {
 		if (!currentRow) {
 			return
 		}
-		console.log(currentRow)
-		window.location.replace(`https://htooexpress.vercel.app/dashboard/print?code=${currentRow.code}&price=${currentRow.sellingPrice}&count=${data.quantity}`)
+		window.location.replace(`https://htooexpress.vercel.app/dashboard/print?code=${currentRow.code}&price=${currentRow.sellingPrice}&count=${data.quantity}&category=${currentRow.product?.brand?.name}/${currentRow.product?.category.name}`)
 	};
 
 	return (
