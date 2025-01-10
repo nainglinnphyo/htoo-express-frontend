@@ -44,7 +44,7 @@ function InvoicePreview() {
 	}, [items])
 
 	return (
-		<Container className="invoice-container">
+		<Container className="invoice-container" w={'14cm'}>
 			<div className="no-print">
 				<Title order={3}>Invoice Preview</Title>
 				<Text size="sm" mb="sm" fw={900}>Invoice ID</Text>
@@ -58,7 +58,7 @@ function InvoicePreview() {
 					Print
 				</Button>
 			</div>
-			<Grid mt={18}>
+			<Grid mt={18} justify='center'>
 				{cartItem.map((c, index) => (
 					<Grid.Col span={3} style={{ height: '1.8cm', width: '2.8cm', justifyItems: "center", margin: '15px' }}>
 						<div
@@ -72,7 +72,7 @@ function InvoicePreview() {
 							<span className="text-sm mb-1" style={{ fontSize: '10px' }}>Ks {c.price}</span>
 							<Barcode
 								value={c.code}
-								width={1}
+								width={0.7}
 								height={24}
 								margin={0}
 								displayValue={false}
