@@ -31,7 +31,7 @@ export function CartDrawer({ opened, close }: { opened: boolean, close: () => vo
 	}
 
 	const handleGenerate = () => {
-		window.location.assign(`http://localhost:3001/dashboard/print`)
+		window.location.assign(`https://htooexpress.vercel.app/dashboard/print`)
 	}
 
 	return (
