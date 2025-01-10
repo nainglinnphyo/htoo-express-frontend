@@ -100,6 +100,7 @@ export function CartDrawer({ opened, close }: { opened: boolean, close: () => vo
 									style={{ width: 80 }}
 								/>
 							</Group>
+							<Divider my="sm" />
 							<Group >
 								<Text size="sm">Price:</Text>
 								<NumberInput
