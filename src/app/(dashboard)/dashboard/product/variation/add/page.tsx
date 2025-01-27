@@ -1,6 +1,6 @@
-"use client";
+"use client"
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react"
 import {
 	Group,
 	Button,
@@ -18,14 +18,21 @@ import {
 	TextInput,
 	Badge,
 	LoadingOverlay,
-} from "@mantine/core";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import { IconGripVertical, IconTrash } from "@tabler/icons-react";
-import { useForm, Controller, useFieldArray } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useCreateProductVariation, useFetchColor, useFetchProductDetails, useFetchSize, useUploadImage } from "@/services/products";
-import { useRouter, useSearchParams } from "next/navigation";
+	Tooltip,
+} from "@mantine/core"
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd"
+import { IconGripVertical, IconTrash, IconCopy, IconTrashX } from "@tabler/icons-react"
+import { useForm, Controller, useFieldArray } from "react-hook-form"
+import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
+import {
+	useCreateProductVariation,
+	useFetchColor,
+	useFetchProductDetails,
+	useFetchSize,
+	useUploadImage,
+} from "@/services/products"
+import { useRouter, useSearchParams } from "next/navigation"
 
 const schema = z.object({
 	variations: z.array(
@@ -36,18 +43,18 @@ const schema = z.object({
 			sellingPrice: z.number().min(0, "Selling price must be non-negative"),
 			purchasedPrice: z.number().min(0, "Purchased price must be non-negative"),
 			images: z.array(z.string()).min(1, "At least one image is required"),
-		})
+		}),
 	),
-});
+})
 
-type FormValues = z.infer<typeof schema>;
+type FormValues = z.infer<typeof schema>
 
 const AddVariationPage = () => {
-	const searchParams = useSearchParams();
-	const productId = searchParams.get("productId") || "";
-	const { data: colors, isLoading: colorLoading } = useFetchColor();
-	const { data: sizes, isLoading: sizeLoading } = useFetchSize();
-	const imageUploader = useUploadImage();
+	const searchParams = useSearchParams()
+	const productId = searchParams.get("productId") || ""
+	const { data: colors, isLoading: colorLoading } = useFetchColor()
+	const { data: sizes, isLoading: sizeLoading } = useFetchSize()
+	const imageUploader = useUploadImage()
 
 	const {
 		control,
@@ -60,100 +67,100 @@ const AddVariationPage = () => {
 		defaultValues: {
 			variations: [{ sizeId: "", colorId: "", sellingPrice: 0, purchasedPrice: 0, images: [] }],
 		},
-	});
+	})
 
 	const { fields, append, remove, move } = useFieldArray({
 		control,
 		name: "variations",
-	});
+	})
 
-	const [previews, setPreviews] = useState<{ [key: string]: string[] }>({});
-	const [isSubmitting, setIsSubmitting] = useState(false);
-	const [isImageLoading, setIsImageLoading] = useState(false);
-	const [imageErrors, setImageErrors] = useState<{ [key: number]: string }>({});
+	const [previews, setPreviews] = useState<{ [key: string]: string[] }>({})
+	const [isSubmitting, setIsSubmitting] = useState(false)
+	const [isImageLoading, setIsImageLoading] = useState(false)
+	const [imageErrors, setImageErrors] = useState<{ [key: number]: string }>({})
 
-	const router = useRouter();
-	const createProduct = useCreateProductVariation();
+	const router = useRouter()
+	const createProduct = useCreateProductVariation()
 
 	const convertToBase64 = (file: File): Promise<string> => {
 		return new Promise((resolve, reject) => {
-			const reader = new FileReader();
-			reader.onloadend = () => resolve(reader.result as string);
-			reader.onerror = () => reject(new Error("Error reading file"));
-			reader.readAsDataURL(file);
-		});
-	};
+			const reader = new FileReader()
+			reader.onloadend = () => resolve(reader.result as string)
+			reader.onerror = () => reject(new Error("Error reading file"))
+			reader.readAsDataURL(file)
+		})
+	}
 
 	const handleImageChange = async (files: File[] | null, index: number) => {
 		if (!files) {
-			setValue(`variations.${index}.images`, []);
-			setPreviews((prev) => ({ ...prev, [index]: [] }));
-			setImageErrors((prev) => ({ ...prev, [index]: "" }));
-			return;
+			setValue(`variations.${index}.images`, [])
+			setPreviews((prev) => ({ ...prev, [index]: [] }))
+			setImageErrors((prev) => ({ ...prev, [index]: "" }))
+			return
 		}
 
-		setIsImageLoading(true); // Set loading to true at the beginning of the process
+		setIsImageLoading(true) // Set loading to true at the beginning of the process
 
-		const fileArray = Array.isArray(files) ? files : [files];
-		const invalidFiles = fileArray.filter((file) => !file.type.startsWith("image/"));
+		const fileArray = Array.isArray(files) ? files : [files]
+		const invalidFiles = fileArray.filter((file) => !file.type.startsWith("image/"))
 		if (invalidFiles.length > 0) {
-			setImageErrors((prev) => ({ ...prev, [index]: "Only image files are allowed" }));
-			setIsImageLoading(false);
-			return;
+			setImageErrors((prev) => ({ ...prev, [index]: "Only image files are allowed" }))
+			setIsImageLoading(false)
+			return
 		}
 
 		if (fileArray.length + (getValues(`variations.${index}.images`) || []).length > 5) {
-			setImageErrors((prev) => ({ ...prev, [index]: "You can only upload a maximum of 5 images" }));
-			setIsImageLoading(false);
-			return;
+			setImageErrors((prev) => ({ ...prev, [index]: "You can only upload a maximum of 5 images" }))
+			setIsImageLoading(false)
+			return
 		}
 
-		const uploadedImageIds: string[] = [];
+		const uploadedImageIds: string[] = []
 
 		try {
 			for (const file of fileArray) {
-				const base64String = await convertToBase64(file);
+				const base64String = await convertToBase64(file)
 
 				await new Promise<void>((resolve, reject) => {
 					imageUploader.mutate(
 						{ image: base64String },
 						{
 							onSuccess: (response) => {
-								uploadedImageIds.push(response._data.id);
+								uploadedImageIds.push(response._data.id)
 								const newPreviews = uploadedImageIds.map(
-									(id) => `https://cloud.farytaxi.com/uploads/product/${id}.${response._data.fileType}`
-								);
+									(id) => `https://cloud.farytaxi.com/uploads/product/${id}.${response._data.fileType}`,
+								)
 
 								setValue(`variations.${index}.images`, [
 									...getValues(`variations.${index}.images`),
 									...uploadedImageIds,
-								]);
+								])
 
 								setPreviews((prev) => ({
 									...prev,
 									[index]: [...(prev[index] || []), ...newPreviews],
-								}));
+								}))
 
-								setImageErrors((prev) => ({ ...prev, [index]: "" }));
-								resolve();
+								setImageErrors((prev) => ({ ...prev, [index]: "" }))
+								resolve()
 							},
 							onError: reject,
-						}
-					);
-				});
+						},
+					)
+				})
 			}
 		} catch (error) {
 			setImageErrors((prev) => ({
 				...prev,
 				[index]: "Error uploading images. Please try again.",
-			}));
+			}))
 		} finally {
-			setIsImageLoading(false); // Set loading to false only after all uploads are complete
+			setIsImageLoading(false) // Set loading to false only after all uploads are complete
 		}
-	};
+	}
 
 	const onSubmit = async (data: FormValues) => {
-		setIsSubmitting(true);
+		setIsSubmitting(true)
 		// const payload = data.variations.map((d)=>{
 		// 	return {
 		// 		...d,
@@ -167,24 +174,58 @@ const AddVariationPage = () => {
 			},
 			{
 				onSuccess() {
-					router.push(`/dashboard/product/variation?id=${productId}`);
-					setIsSubmitting(false);
+					router.push(`/dashboard/product/variation?id=${productId}`)
+					setIsSubmitting(false)
 				},
 				onError() {
-					setIsSubmitting(false);
+					setIsSubmitting(false)
 				},
-			}
-		);
-	};
+			},
+		)
+	}
 
 	const { data: product, isLoading, isError, refetch } = useFetchProductDetails(productId)
 
 	useEffect(() => {
-		refetch();
-	}, [refetch, productId]);
+		refetch()
+	}, [refetch, productId])
 
 	if (isLoading || !product) {
 		return <LoadingOverlay visible={true} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} />
+	}
+
+	const handleCopyRow = (id: string) => {
+		const index = fields.findIndex((field) => field.id === id)
+		if (index !== -1) {
+			const itemToCopy = getValues(`variations.${index}`)
+			const newItem = {
+				sizeId: "",
+				colorId: "",
+				sellingPrice: itemToCopy.sellingPrice,
+				purchasedPrice: itemToCopy.purchasedPrice,
+				images: [...itemToCopy.images],
+				code: "",
+			}
+			append(newItem)
+
+			// Copy the image previews
+			if (previews[index]) {
+				setPreviews((prev) => ({
+					...prev,
+					[fields.length]: [...prev[index]],
+				}))
+			}
+		}
+	}
+
+	const handleRemoveRow = (index: number) => {
+		remove(index)
+		// Also remove the previews for this row
+		setPreviews((prev) => {
+			const newPreviews = { ...prev }
+			delete newPreviews[index]
+			return newPreviews
+		})
 	}
 
 	return (
@@ -194,7 +235,9 @@ const AddVariationPage = () => {
 			</Text>
 
 			<form onSubmit={handleSubmit(onSubmit)}>
-				<DragDropContext onDragEnd={({ destination, source }) => move(source.index, destination?.index ?? source.index)}>
+				<DragDropContext
+					onDragEnd={({ destination, source }) => move(source.index, destination?.index ?? source.index)}
+				>
 					<Droppable droppableId="variations" direction="vertical">
 						{(provided) => (
 							<div {...provided.droppableProps} ref={provided.innerRef}>
@@ -215,7 +258,7 @@ const AddVariationPage = () => {
 																	<TextInput
 																		required={false}
 																		label="Code"
-																		placeholder='Enter code'
+																		placeholder="Enter code"
 																		error={errors.variations?.[index]?.code?.message}
 																		{...field}
 																	/>
@@ -258,9 +301,7 @@ const AddVariationPage = () => {
 																		{field.value && (
 																			<div>
 																				Selected Hex Code:{" "}
-																				{
-																					colors?.data.find((c) => c.id === field.value)?.hexCode || "N/A"
-																				}
+																				{colors?.data.find((c) => c.id === field.value)?.hexCode || "N/A"}
 																				<div
 																					style={{
 																						width: "20px",
@@ -316,21 +357,27 @@ const AddVariationPage = () => {
 															<SimpleGrid cols={4} spacing="xs">
 																{previews[index].map((preview, i) => (
 																	<Box key={i} style={{ position: "relative" }}>
-																		<Image src={preview} alt={`Preview ${i + 1}`} radius="md" fit="cover" height={100} />
+																		<Image
+																			src={preview || "/placeholder.svg"}
+																			alt={`Preview ${i + 1}`}
+																			radius="md"
+																			fit="cover"
+																			height={100}
+																		/>
 																		<Button
 																			size="xs"
 																			color="red"
 																			variant="filled"
 																			style={{ position: "absolute", top: 5, right: 5 }}
 																			onClick={() => {
-																				const images = getValues(`variations.${index}.images`);
-																				images.splice(i, 1);
-																				setValue(`variations.${index}.images`, images);
+																				const images = getValues(`variations.${index}.images`)
+																				images.splice(i, 1)
+																				setValue(`variations.${index}.images`, images)
 																				setPreviews((prev) => {
-																					const updatedPreviews = { ...prev };
-																					updatedPreviews[index] = updatedPreviews[index]?.filter((_, idx) => idx !== i);
-																					return updatedPreviews;
-																				});
+																					const updatedPreviews = { ...prev }
+																					updatedPreviews[index] = updatedPreviews[index]?.filter((_, idx) => idx !== i)
+																					return updatedPreviews
+																				})
 																			}}
 																		>
 																			<IconTrash size="0.8rem" />
@@ -339,6 +386,29 @@ const AddVariationPage = () => {
 																))}
 															</SimpleGrid>
 														)}
+														<Group>
+															<Tooltip label="Copy variation">
+																<IconCopy
+																	size="1.2rem"
+																	onClick={() => handleCopyRow(item.id)}
+																	cursor={"pointer"}
+																	style={{ marginRight: "8px" }}
+																/>
+															</Tooltip>
+															<Tooltip
+																label={fields.length === 1 ? "Cannot remove last variation" : "Remove variation"}
+															>
+																<span>
+																	<IconTrashX
+																		size="1.2rem"
+																		onClick={() => fields.length > 1 && handleRemoveRow(index)}
+																		cursor={fields.length > 1 ? "pointer" : "not-allowed"}
+																		style={{ marginRight: "8px" }}
+																		color={fields.length > 1 ? "red" : "gray"}
+																	/>
+																</span>
+															</Tooltip>
+														</Group>
 													</Stack>
 												</Group>
 											</Paper>
@@ -352,7 +422,12 @@ const AddVariationPage = () => {
 				</DragDropContext>
 
 				<Group>
-					<Button loading={isSubmitting || isImageLoading} onClick={() => append({ sizeId: "", colorId: "", sellingPrice: 0, purchasedPrice: 0, images: [], code: '' })}>
+					<Button
+						loading={isSubmitting || isImageLoading}
+						onClick={() =>
+							append({ sizeId: "", colorId: "", sellingPrice: 0, purchasedPrice: 0, images: [], code: "" })
+						}
+					>
 						Add Variation
 					</Button>
 					<Button type="submit" loading={isSubmitting || isImageLoading}>
@@ -361,7 +436,8 @@ const AddVariationPage = () => {
 				</Group>
 			</form>
 		</Paper>
-	);
-};
+	)
+}
 
-export default AddVariationPage;
+export default AddVariationPage
+
