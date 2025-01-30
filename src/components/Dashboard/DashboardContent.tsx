@@ -93,7 +93,7 @@ const hourlyTraffic = Array.from({ length: 24 }, (_, i) => ({
 
 export function EnhancedPOSDashboard() {
 	const theme = useMantineTheme()
-	const [dateRange, setDateRange] = useState<DateRangePickerValue>([null, null])
+	// const [dateRange, setDateRange] = useState<DateRangePickerValue>([null, null])
 	const [selectedLocation, setSelectedLocation] = useState<string | null>("all")
 
 	const locations = [

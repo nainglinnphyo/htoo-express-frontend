@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import {
 	Group,
 	Button,
@@ -13,8 +13,6 @@ import {
 	FileInput,
 	Image,
 	SimpleGrid,
-	ColorSwatch,
-	Loader,
 	TextInput,
 	Badge,
 	LoadingOverlay,
@@ -42,6 +40,7 @@ const schema = z.object({
 			colorId: z.string().min(1, "Color is required"),
 			sellingPrice: z.number().min(0, "Selling price must be non-negative"),
 			purchasedPrice: z.number().min(0, "Purchased price must be non-negative"),
+			stock: z.number().min(0, "Stock quantity must be non-negative"),
 			images: z.array(z.string()).min(1, "At least one image is required"),
 		}),
 	),
@@ -65,7 +64,7 @@ const AddVariationPage = () => {
 	} = useForm<FormValues>({
 		resolver: zodResolver(schema),
 		defaultValues: {
-			variations: [{ sizeId: "", colorId: "", sellingPrice: 0, purchasedPrice: 0, images: [] }],
+			variations: [{ sizeId: "", colorId: "", sellingPrice: 0, purchasedPrice: 0, stock: 0, images: [] }],
 		},
 	})
 
@@ -161,12 +160,7 @@ const AddVariationPage = () => {
 
 	const onSubmit = async (data: FormValues) => {
 		setIsSubmitting(true)
-		// const payload = data.variations.map((d)=>{
-		// 	return {
-		// 		...d,
-		// 		code: d.code === '' ? d.
-		// 	}
-		// })
+
 		createProduct.mutate(
 			{
 				productId,
@@ -203,6 +197,7 @@ const AddVariationPage = () => {
 				colorId: "",
 				sellingPrice: itemToCopy.sellingPrice,
 				purchasedPrice: itemToCopy.purchasedPrice,
+				stock: itemToCopy.stock,
 				images: [...itemToCopy.images],
 				code: "",
 			}
@@ -344,6 +339,18 @@ const AddVariationPage = () => {
 																	/>
 																)}
 															/>
+															<Controller
+																name={`variations.${index}.stock`}
+																control={control}
+																render={({ field }) => (
+																	<NumberInput
+																		label="Stock Quantity"
+																		min={0}
+																		error={errors.variations?.[index]?.stock?.message}
+																		{...field}
+																	/>
+																)}
+															/>
 														</Group>
 														<FileInput
 															label="Upload Images"
@@ -425,7 +432,7 @@ const AddVariationPage = () => {
 					<Button
 						loading={isSubmitting || isImageLoading}
 						onClick={() =>
-							append({ sizeId: "", colorId: "", sellingPrice: 0, purchasedPrice: 0, images: [], code: "" })
+							append({ sizeId: "", colorId: "", sellingPrice: 0, purchasedPrice: 0, stock: 0, images: [], code: "" })
 						}
 					>
 						Add Variation

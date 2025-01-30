@@ -19,6 +19,7 @@ import { FormattedNumber } from '@/components/Text/NumberFormatter'
 function InvoicePreview() {
 	const [cartItem, setCartItem] = useState<{ code: string, price: number, category: string }[]>([])
 	const { items } = useCartStore()
+	console.log({ items })
 	const handlePrint = () => {
 		window.print()
 	}
@@ -44,6 +45,10 @@ function InvoicePreview() {
 
 	}, [items])
 
+	if (items.reduce((a, b) => a + b.quantity, 0) !== 21) {
+		return <>Please insert 21 barcode</>
+	}
+
 	return (
 		// h={`${2 * cartItem.length}cm`}
 		<Container className="invoice-container" w={'14cm'}>
@@ -59,8 +64,11 @@ function InvoicePreview() {
 				</Button>
 			</div>
 			<SimpleGrid cols={3} style={{ justifyContent: "center", alignItems: 'center' }}>
+
 				{cartItem.map((c, index) => (
+
 					<div style={{ justifyItems: "center", marginTop: index >= 0 && index <= 2 ? 10 : index > 2 && index <= 5 ? 12 : index > 14 && index <= 17 ? 16 : index > 17 && index <= 20 ? 18 : 14, marginBottom: 18 }}>
+
 						<div
 							key={index}
 							style={{
@@ -72,7 +80,7 @@ function InvoicePreview() {
 						>
 							<div className="mb-1" style={{ display: "flex", alignItems: 'center' }}>
 								<span style={{ fontSize: 10 }}>Ks &nbsp;</span>
-								<FormattedNumber value={c.price} />
+								<FormattedNumber value={c.price} style={{ fontSize: 10 }} />
 							</div>
 							<Barcode
 								value={c.code}
@@ -87,9 +95,6 @@ function InvoicePreview() {
 					</div>
 				))}
 			</SimpleGrid>
-
-
-
 		</Container >
 	)
 }

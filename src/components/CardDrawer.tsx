@@ -101,7 +101,7 @@ export function CartDrawer({ opened, close }: { opened: boolean, close: () => vo
 								/>
 							</Group>
 							<Divider my="sm" />
-							<Group >
+							{/* <Group >
 								<Text size="sm">Price:</Text>
 								<NumberInput
 									min={0}
@@ -111,7 +111,7 @@ export function CartDrawer({ opened, close }: { opened: boolean, close: () => vo
 									size="sm"
 									style={{ width: 80 }}
 								/>
-							</Group>
+							</Group> */}
 						</Card>
 					))
 				) : (
