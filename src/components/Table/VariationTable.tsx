@@ -93,6 +93,9 @@ export function VariationTable({ product, isProductLoading }: { product?: Produc
 		state: {
 			isLoading,
 		},
+		initialState: { density: 'md' },
+		enableRowNumbers: true,
+		rowNumberMode: 'static',
 		enablePagination: false,
 		positionActionsColumn: 'last',
 		renderRowActionMenuItems: ({ row }) => (

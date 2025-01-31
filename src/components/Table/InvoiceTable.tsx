@@ -117,6 +117,9 @@ export function InvoiceTable() {
 			isLoading,
 		},
 		enablePagination: false,
+		initialState: { density: 'md' },
+		enableRowNumbers: true,
+		rowNumberMode: 'static',
 		positionActionsColumn: 'last',
 		renderRowActionMenuItems: ({ row }) => (
 			<>

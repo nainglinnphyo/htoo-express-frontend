@@ -205,6 +205,9 @@ export function VariationDetailsTable({ product, isProductLoading, sizeId }: { p
 		positionActionsColumn: 'last',
 		enableColumnResizing: true,
 		columnResizeMode: 'onEnd',
+		initialState: { density: 'md' },
+		enableRowNumbers: true,
+		rowNumberMode: 'static',
 		renderRowActionMenuItems: ({ row }) => (
 			<>
 				<Menu.Item onClick={() => handleAddToBarCodeList(row.original)}>Add To Barcode</Menu.Item >

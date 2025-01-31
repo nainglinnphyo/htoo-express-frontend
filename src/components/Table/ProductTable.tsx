@@ -103,6 +103,9 @@ export function ProductTable() {
 		state: {
 			isLoading,
 		},
+		initialState: { density: 'md' },
+		enableRowNumbers: true,
+		rowNumberMode: 'static',
 		enablePagination: false,
 		positionActionsColumn: 'last',
 		renderRowActionMenuItems: ({ row }) => (

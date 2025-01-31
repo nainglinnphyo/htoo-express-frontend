@@ -72,6 +72,9 @@ export function SizeTable({ opened }: { opened: boolean }) {
 					isLoading,
 				}}
 				enablePagination={false}
+				initialState={{ density: "md" }}
+				enableRowNumbers={true}
+				rowNumberMode='static'
 			/>
 			<Space h="md" />
 			{/* Manual Pagination Control */}
