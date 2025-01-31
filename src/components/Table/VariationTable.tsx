@@ -14,7 +14,7 @@ export function VariationTable({ product, isProductLoading }: { product?: Produc
 	const theme = useMantineTheme();
 	const [pagination, setPagination] = useState({
 		pageIndex: 0,
-		pageSize: 5,
+		pageSize: 10,
 	});
 
 

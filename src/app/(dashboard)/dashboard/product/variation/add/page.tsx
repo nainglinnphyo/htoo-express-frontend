@@ -194,7 +194,7 @@ const AddVariationPage = () => {
 			const itemToCopy = getValues(`variations.${index}`)
 			const newItem = {
 				sizeId: "",
-				colorId: "",
+				colorId: itemToCopy.colorId,
 				sellingPrice: itemToCopy.sellingPrice,
 				purchasedPrice: itemToCopy.purchasedPrice,
 				stock: itemToCopy.stock,

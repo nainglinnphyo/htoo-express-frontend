@@ -24,7 +24,6 @@ export default function ProductPage() {
 		}
 	}, [user])
 
-	console.log('Product Permissions:', productPermissions)
 
 	return (
 		<PageContainer title="Product">
