@@ -75,10 +75,17 @@ export function InvoiceTable() {
 				),
 			},
 			{
-				accessorKey: "tax",
-				header: "Tax",
+				accessorKey: "paymentMethod",
+				header: "Payment Method",
 				Cell: ({ row }) => (
-					<Text size="sm" fw={900}>{row.original.tax} Ks</Text>
+					<Text size="sm" fw={900}>{row.original.paymentMethod}</Text>
+				),
+			},
+			{
+				accessorKey: "grossPrice",
+				header: "Gross Price",
+				Cell: ({ row }) => (
+					<Text size="sm" fw={900}>{row.original.grossPrice} Ks</Text>
 				),
 			},
 			{

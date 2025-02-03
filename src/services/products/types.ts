@@ -113,6 +113,7 @@ export interface ProductVariationInvoiceResponse {
 }
 
 export interface createInvoicePayload {
+	paymentMethods: string;
 	note?: string;
 	phone?: string;
 	name?: string;

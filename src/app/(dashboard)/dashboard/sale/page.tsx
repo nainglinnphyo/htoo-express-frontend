@@ -40,6 +40,19 @@ import { AnimatedPageTransition } from "@/components/Product/AnimatedPageTransit
 import { AnimatedProductCard } from "@/components/Product/AnimatedProductCard"
 import { useCallback } from "react"
 
+enum PAYMENT_METHODS {
+	CASH = "CASH",
+	KBZ_PAY = "KBZ_PAY",
+	AYA_PAY = "AYA_PAY",
+	CB_PAY = "CB_PAY",
+	UAB_PAY = "UAB_PAY",
+	WAVE_PAY = "WAVE_PAY",
+	KBZ_BANK = "KBZ_BANK",
+	AYA_BANK = "AYA_BANK",
+	CB_BANK = "CB_BANK",
+	UAB_BANK = "UAB_BANK",
+}
+
 interface Product {
 	id: string
 	code: string
@@ -59,6 +72,7 @@ const formSchema = z.object({
 	note: z.string().optional(),
 	discountType: z.string(),
 	discountValue: z.number().default(0),
+	paymentMethods: z.string()
 })
 
 type FormValues = z.infer<typeof formSchema>
@@ -173,6 +187,7 @@ export default function SaleVoucherPage() {
 			taxRate: 0,
 			discountType: "MMK",
 			discountValue: 0,
+			paymentMethods: "CASH"
 		},
 	})
 
@@ -264,6 +279,7 @@ export default function SaleVoucherPage() {
 					discountType: formValue.discountType,
 					discountValue: formValue.discountValue,
 					discountAmount: discountAmount,
+					paymentMethods: formValue.paymentMethods,
 					variation: voucher.map((d) => ({
 						qty: productQuantities[d.id],
 						total: d.price * productQuantities[d.id],
@@ -576,7 +592,40 @@ export default function SaleVoucherPage() {
 										)}
 									</Flex>
 
-									{/* Tax Section */}
+									{/* Payment Section */}
+									<Flex justify="space-between" align="center" >
+										<Controller
+											name="paymentMethods"
+											control={control}
+											render={({ field }) => (
+												<Select
+													w={'50%'}
+													label="Payment"
+													placeholder="Select Payment Method"
+													value={field.value}
+													defaultValue={'Cash'}
+													onChange={(value) => {
+														field.onChange(value)
+													}}
+													error={errors.paymentMethods?.message}
+													data={[
+														{ value: "CASH", label: "Cash" },
+														{ value: "KBZ_PAY", label: "KBZ Pay" },
+														{ value: "AYA_PAY", label: "AYA Pay" },
+														{ value: "UAB_PAY", label: "UAB Pay" },
+														{ value: "WAVE_PAY", label: "WAVE Pay" },
+														{ value: "KBZ_BANK", label: "KBZ Bank" },
+														{ value: "AYA_BANK", label: "AYA Bank" },
+														{ value: "CB_BANK", label: "CB Bank" },
+														{ value: "UAB_BANK", label: "UAB Bank" },
+													]}
+													style={{ width: "100px" }}
+												/>
+											)}
+										/>
+
+									</Flex>
+
 									<Flex justify="space-between" align="center">
 										<Controller
 											name="taxRate"

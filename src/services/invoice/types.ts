@@ -20,6 +20,7 @@ export interface Invoice {
 		perPrice: number;
 		quantity: number;
 	}[];
+	paymentMethod: string;
 }
 
 export interface InvoiceListResponse {

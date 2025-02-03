@@ -105,6 +105,10 @@ function InvoicePreview() {
 						<Text size="sm" fw={900} className='important-font'>Discount:</Text>
 						<Text className='important-font'>{data?.data.discountAmount}</Text>
 					</Flex>
+					{/* <Flex justify="space-between">
+						<Text size="sm" fw={900} className='important-font'>Payment Method:</Text>
+						<Text className='important-font'>{data?.data.paymentMethod}</Text>
+					</Flex> */}
 					<Flex justify="space-between">
 						<Text size="sm" fw={900} className='important-font'>Tax:</Text>
 						<Text className='important-font'>{data?.data.tax}</Text>
