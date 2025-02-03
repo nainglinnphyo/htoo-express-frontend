@@ -1,16 +1,15 @@
-'use client'
+"use client"
 
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { useForm, Controller } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
+import { useEffect, useRef, useState } from "react"
+import { useForm, Controller } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod"
 import {
 	Image,
 	Button,
 	Container,
 	Grid,
 	TextInput,
-	Title,
 	Text,
 	Card,
 	Group,
@@ -24,19 +23,22 @@ import {
 	Modal,
 	Flex,
 	Stack,
-	Skeleton,
-	Loader,
 	LoadingOverlay,
 	NumberInput,
-} from '@mantine/core'
-import { IconShoppingCart, IconPlus, IconUser, IconSearch } from '@tabler/icons-react'
-import { useCreateInvoice, useGetProductVariationForVoucher } from '@/services/products'
-import { useDebouncedValue } from '@mantine/hooks'
-import { useRouter } from 'next/navigation'
-import { FormattedNumber } from '@/components/Text/NumberFormatter'
-import { AnimatePresence } from 'framer-motion'
-import { AnimatedPageTransition } from '@/components/Product/AnimatedPageTransition'
-import { AnimatedProductCard } from '@/components/Product/AnimatedProductCard'
+} from "@mantine/core"
+import { IconShoppingCart, IconPlus, IconUser, IconSearch } from "@tabler/icons-react"
+import {
+	useCreateInvoice,
+	useGetProductVariationForVoucher,
+	useGetProductVariationForVoucherDetail,
+} from "@/services/products"
+import { useDebouncedValue } from "@mantine/hooks"
+import { useRouter } from "next/navigation"
+import { FormattedNumber } from "@/components/Text/NumberFormatter"
+import { AnimatePresence } from "framer-motion"
+import { AnimatedPageTransition } from "@/components/Product/AnimatedPageTransition"
+import { AnimatedProductCard } from "@/components/Product/AnimatedProductCard"
+import { useCallback } from "react"
 
 interface Product {
 	id: string
@@ -64,17 +66,16 @@ type FormValues = z.infer<typeof formSchema>
 export default function SaleVoucherPage() {
 	const router = useRouter()
 	const [productsData, setProductsData] = useState<Product[]>([])
-	const [searchQuery, setSearchQuery] = useState('')
+	const [searchQuery, setSearchQuery] = useState("")
 	const [voucher, setVoucher] = useState<Product[]>([])
 	const [productQuantities, setProductQuantities] = useState<Record<string, number>>({})
 	const [confirmModalOpened, setConfirmModalOpened] = useState(false)
 	const [formValue, setFormValue] = useState<FormValues | null>(null)
 	const [totalTax, setTotalTax] = useState(0)
-	const [discountType, setDiscountType] = useState('MMK')
+	const [discountType, setDiscountType] = useState("MMK")
 	const [discountValue, setDiscountValue] = useState(0)
 	const [discountAmount, setDiscountAmount] = useState(0)
-	const [scanText, setScanText] = useState('')
-	const [currentScanProduct, setCurrentScanProduct] = useState<any>(null)
+	const [scanText, setScanText] = useState("")
 
 	const inputRef = useRef<HTMLInputElement>(null)
 
@@ -85,7 +86,7 @@ export default function SaleVoucherPage() {
 	}, [])
 
 	const playNotificationSound = () => {
-		const audio = new Audio('/scan.mp3')
+		const audio = new Audio("/scan.mp3")
 		audio.play()
 	}
 
@@ -94,21 +95,27 @@ export default function SaleVoucherPage() {
 	const { data, isLoading, refetch } = useGetProductVariationForVoucher({
 		pagination: {
 			page: 1,
-			size: 100,
+			size: 20,
 		},
 		filters: {
-			search: debouncedSearchQuery || scanText,
+			search: debouncedSearchQuery,
 		},
 	})
+
+	const {
+		data: details,
+		isLoading: detailsLoading,
+		refetch: detailRefetch,
+	} = useGetProductVariationForVoucherDetail(scanText)
 
 	const updateProductsData = useCallback(() => {
 		if (data) {
 			const products: Product[] = data.data.map((p) => ({
-				id: p.id || '',
-				code: p.code || '',
-				category: `${p.product?.brand?.name || ''} / ${p.product?.category.name || ''} / ${p.product?.subCategory.name || ''
+				id: p.id || "",
+				code: p.code || "",
+				category: `${p.product?.brand?.name || ""} / ${p.product?.category.name || ""} / ${p.product?.subCategory.name || ""
 					}`,
-				name: `${p.product?.name || ''} / ${p.size?.name || ''} / ${p.color?.name || ''}`,
+				name: `${p.product?.name || ""} / ${p.size?.name || ""} / ${p.color?.name || ""}`,
 				price: p.sellingPrice || 0,
 				image: p.image?.map((d) => d.path) || [],
 			}))
@@ -116,22 +123,54 @@ export default function SaleVoucherPage() {
 		}
 	}, [data])
 
+	const updateScanProduct = useCallback(() => {
+		if (details) {
+			if (scanText && details && details.data) {
+				const scannedProduct = {
+					id: details.data.id || "",
+					code: details.data.code || "",
+					category: `${details.data.product?.brand?.name || ""} / ${details.data.product?.category.name || ""} / ${details.data.product?.subCategory.name || ""}`,
+					name: `${details.data.product?.name || ""} / ${details.data.size?.name || ""} / ${details.data.color?.name || ""}`,
+					price: details.data.sellingPrice || 0,
+					image: details.data.image?.map((d: any) => d.path) || [],
+				}
+				handleAddToVoucher(scannedProduct)
+				playNotificationSound()
+				setScanText("") // Clear the scan text after processing
+			}
+		}
+	}, [details])
+
 	useEffect(() => {
 		updateProductsData()
 	}, [updateProductsData])
 
 	useEffect(() => {
+		updateScanProduct()
+	}, [updateScanProduct])
+
+	useEffect(() => {
 		refetch()
 	}, [debouncedSearchQuery, refetch])
 
-	const { control, handleSubmit, formState: { errors }, setValue, watch } = useForm<FormValues>({
+	useEffect(() => {
+		detailRefetch()
+	}, [scanText])
+
+	const {
+		control,
+		handleSubmit,
+		formState: { errors },
+		setValue,
+		watch,
+	} = useForm<FormValues>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
-			customerName: '',
-			customerPhone: '',
-			address: '',
+			customerName: "",
+			customerPhone: "",
+			address: "",
 			taxRate: 0,
-			discountType: 'MMK',
+			discountType: "MMK",
 			discountValue: 0,
 		},
 	})
@@ -165,10 +204,7 @@ export default function SaleVoucherPage() {
 		}
 	}
 
-	const subtotal = voucher.reduce(
-		(sum, item) => sum + item.price * (productQuantities[item.id] || 1),
-		0
-	)
+	const subtotal = voucher.reduce((sum, item) => sum + item.price * (productQuantities[item.id] || 1), 0)
 
 	const handleChangeTax = (e: number) => {
 		setTotalTax(subtotal * (e / 100))
@@ -178,7 +214,7 @@ export default function SaleVoucherPage() {
 		if (!value) value = 0
 
 		// Validate and cap the discount value based on type
-		if (discountType === 'PERCENTAGE') {
+		if (discountType === "PERCENTAGE") {
 			value = Math.min(value, 100) // Cap percentage at 100%
 			const calculatedDiscount = (value / 100) * subtotal
 			setDiscountAmount(calculatedDiscount)
@@ -188,7 +224,7 @@ export default function SaleVoucherPage() {
 		}
 
 		setDiscountValue(value)
-		setValue('discountValue', value)
+		setValue("discountValue", value)
 	}
 
 	const handleDiscountTypeChange = (type: string | null) => {
@@ -198,8 +234,8 @@ export default function SaleVoucherPage() {
 		// Reset discount value when changing type
 		setDiscountValue(0)
 		setDiscountAmount(0)
-		setValue('discountValue', 0)
-		setValue('discountType', type)
+		setValue("discountValue", 0)
+		setValue("discountType", type)
 	}
 
 	const onSubmit = (data: FormValues) => {
@@ -238,10 +274,10 @@ export default function SaleVoucherPage() {
 						if (response._data) {
 							router.push(`/dashboard/invoice/details?id=${response._data.createdInvoiceId}`)
 						} else {
-							router.push('/dashboard/invoice')
+							router.push("/dashboard/invoice")
 						}
 					},
-				}
+				},
 			)
 		} catch (error) {
 			console.error(error)
@@ -249,59 +285,16 @@ export default function SaleVoucherPage() {
 		setConfirmModalOpened(false)
 	}
 
-	const taxRate = watch('taxRate')
+	const taxRate = watch("taxRate")
 	const taxAmount = subtotal * (Number(taxRate) / 100)
 	const total = subtotal - discountAmount + taxAmount
 
-
-	const handleScan = async (text: string) => {
-		try {
-			if (!text?.trim()) return;
-			const trimmedText = text.trim();
-			setScanText(text)
-			if (trimmedText.length < 14) return null;
-			const result = await refetch();
-			if (!result.data?.data) return;
-			const scannedProduct = result.data.data.find(p => p.code === trimmedText);
-			if (scannedProduct) {
-				const product = {
-					id: scannedProduct.id || '',
-					code: scannedProduct.code || '',
-					category: `${scannedProduct.product?.brand?.name || ''} / ${scannedProduct.product?.category.name || ''} / ${scannedProduct.product?.subCategory.name || ''}`,
-					name: `${scannedProduct.product?.name || ''} / ${scannedProduct.size?.name || ''} / ${scannedProduct.color?.name || ''}`,
-					price: scannedProduct.sellingPrice || 0,
-					image: scannedProduct.image?.map((d) => {
-						return d.path
-					}) || []
-				};
-				setCurrentScanProduct(product)
-				setVoucher(prevVoucher => {
-					const existingProductIndex = prevVoucher.findIndex(item => item.id === product.id);
-					if (existingProductIndex !== -1) {
-						// If product exists, update its quantity
-						const updatedVoucher = [...prevVoucher];
-						updatedVoucher[existingProductIndex] = {
-							...updatedVoucher[existingProductIndex],
-							qty: (updatedVoucher[existingProductIndex].qty || 0) + 1,
-						};
-						return updatedVoucher;
-					} else {
-						// If product is new, add it to voucher with quantity 1
-						return [...prevVoucher, { ...product, qty: 1 }];
-					}
-				});
-				setProductQuantities(prevQuantities => ({
-					...prevQuantities,
-					[product.id]: (prevQuantities[product.id] || 0) + 1,
-				}));
-				playNotificationSound()
-				setScanText('')
-			}
-			setScanText('')
-		} catch (error) {
-			console.error('Error processing scanned product:', error);
-		}
+	const handleScan = (text: string) => {
+		setScanText(text)
+		setSearchQuery(text)
 	}
+
+	console.log(scanText)
 
 	return (
 		<AnimatedPageTransition>
@@ -317,6 +310,12 @@ export default function SaleVoucherPage() {
 							value={scanText}
 							ref={inputRef}
 							onChange={(e) => handleScan(e.target.value)}
+							onKeyDown={(e) => {
+								if (e.key === "Enter") {
+									handleScan(scanText)
+									setScanText("")
+								}
+							}}
 							style={{ flexGrow: 1 }}
 						/>
 					</Group>
@@ -344,8 +343,8 @@ export default function SaleVoucherPage() {
 												<th>Code</th>
 												<th>Name</th>
 												<th>Category</th>
-												<th style={{ textAlign: 'right' }}>Price</th>
-												<th style={{ textAlign: 'center' }}>Actions</th>
+												<th style={{ textAlign: "right" }}>Price</th>
+												<th style={{ textAlign: "center" }}>Actions</th>
 											</tr>
 										</thead>
 										<tbody>
@@ -358,71 +357,61 @@ export default function SaleVoucherPage() {
 											) : (
 												productsData.map((product) => (
 													<tr key={product.id}>
-														<td style={{ textAlign: 'center', padding: '1rem' }}>{product.code}</td>
-														<td style={{ textAlign: 'center', padding: '1rem' }}>{product.name}</td>
-														<td style={{ textAlign: 'center', padding: '1rem' }}>
-															{product.category}
-														</td>
-														<td style={{ textAlign: 'right', padding: '1rem' }}>
+														<td style={{ textAlign: "center", padding: "1rem" }}>{product.code}</td>
+														<td style={{ textAlign: "center", padding: "1rem" }}>{product.name}</td>
+														<td style={{ textAlign: "center", padding: "1rem" }}>{product.category}</td>
+														<td style={{ textAlign: "right", padding: "1rem" }}>
 															<Flex justify="flex-end" align="center">
 																<Text size="sm" mr={4}>
 																	Ks
 																</Text>
-																<FormattedNumber
-																	value={Number(product.price.toFixed(2))}
-																	fw={600}
-																/>
+																<FormattedNumber value={Number(product.price.toFixed(2))} fw={600} />
 															</Flex>
 														</td>
 														<td>
-															{product.image && product.image.length > 0 && (
+															{product.image &&
+																product.image.length > 0 &&
 																product.image.map((d: any) => (
 																	<Image
 																		style={{ cursor: "pointer" }}
-																		src={d}
+																		src={d || "/placeholder.svg"}
 																		alt=""
 																		radius="md"
 																		fit="contain"
 																		height={50}
 																		width={50}
 																		onClick={() => {
-																			const modal = document.createElement('div');
-																			modal.style.position = 'fixed';
-																			modal.style.top = '0';
-																			modal.style.left = '0';
-																			modal.style.width = '100%';
-																			modal.style.height = '100%';
-																			modal.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-																			modal.style.display = 'flex';
-																			modal.style.justifyContent = 'center';
-																			modal.style.alignItems = 'center';
-																			modal.style.zIndex = '1000';
+																			const modal = document.createElement("div")
+																			modal.style.position = "fixed"
+																			modal.style.top = "0"
+																			modal.style.left = "0"
+																			modal.style.width = "100%"
+																			modal.style.height = "100%"
+																			modal.style.backgroundColor = "rgba(0, 0, 0, 0.8)"
+																			modal.style.display = "flex"
+																			modal.style.justifyContent = "center"
+																			modal.style.alignItems = "center"
+																			modal.style.zIndex = "1000"
 
-																			const modalImage: any = document.createElement('img');
-																			modalImage.src = d;
-																			modalImage.alt = d;
-																			modalImage.style.maxWidth = '90%';
-																			modalImage.style.maxHeight = '90%';
+																			const modalImage: any = document.createElement("img")
+																			modalImage.src = d
+																			modalImage.alt = d
+																			modalImage.style.maxWidth = "90%"
+																			modalImage.style.maxHeight = "90%"
 
-																			modal.appendChild(modalImage);
-																			document.body.appendChild(modal);
+																			modal.appendChild(modalImage)
+																			document.body.appendChild(modal)
 
-																			modal.addEventListener('click', () => {
-																				document.body.removeChild(modal);
-																			});
+																			modal.addEventListener("click", () => {
+																				document.body.removeChild(modal)
+																			})
 																		}}
 																	/>
-																))
-															)
-
-															}
+																))}
 														</td>
-														<td style={{ textAlign: 'center', padding: '1rem' }}>
+														<td style={{ textAlign: "center", padding: "1rem" }}>
 															<Tooltip label="Add to Voucher">
-																<ActionIcon
-																	color="blue"
-																	onClick={() => handleAddToVoucher(product)}
-																>
+																<ActionIcon color="blue" onClick={() => handleAddToVoucher(product)}>
 																	<IconPlus size={16} />
 																</ActionIcon>
 															</Tooltip>
@@ -546,10 +535,10 @@ export default function SaleVoucherPage() {
 														value={discountType}
 														onChange={handleDiscountTypeChange}
 														data={[
-															{ value: 'MMK', label: 'MMK' },
-															{ value: 'PERCENTAGE', label: 'Percentage' },
+															{ value: "MMK", label: "MMK" },
+															{ value: "PERCENTAGE", label: "Percentage" },
 														]}
-														style={{ width: '120px' }}
+														style={{ width: "120px" }}
 													/>
 												)}
 											/>
@@ -559,13 +548,13 @@ export default function SaleVoucherPage() {
 												render={({ field }) => (
 													<NumberInput
 														label="Discount Value"
-														placeholder={`Enter ${discountType === 'PERCENTAGE' ? '%' : 'MMK'}`}
+														placeholder={`Enter ${discountType === "PERCENTAGE" ? "%" : "MMK"}`}
 														min={0}
-														max={discountType === 'PERCENTAGE' ? 100 : subtotal}
+														max={discountType === "PERCENTAGE" ? 100 : subtotal}
 														value={discountValue}
 														onChange={(value) => handleDiscountAmountChange(Number(value))}
 														error={errors.discountValue?.message}
-														style={{ width: '150px' }}
+														style={{ width: "150px" }}
 													/>
 												)}
 											/>
@@ -601,12 +590,12 @@ export default function SaleVoucherPage() {
 													}}
 													error={errors.taxRate?.message}
 													data={[
-														{ value: '0', label: '0%' },
-														{ value: '5', label: '5%' },
-														{ value: '10', label: '10%' },
-														{ value: '15', label: '15%' },
+														{ value: "0", label: "0%" },
+														{ value: "5", label: "5%" },
+														{ value: "10", label: "10%" },
+														{ value: "15", label: "15%" },
 													]}
-													style={{ width: '100px' }}
+													style={{ width: "100px" }}
 												/>
 											)}
 										/>
@@ -649,6 +638,7 @@ export default function SaleVoucherPage() {
 					</Group>
 				</Modal>
 			</Container>
-		</AnimatedPageTransition >
+		</AnimatedPageTransition>
 	)
 }
+

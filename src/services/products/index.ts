@@ -304,6 +304,23 @@ export const useGetProductVariationForVoucher = ({
 		placeholderData: keepPreviousData,
 	});
 
+const getProductVariationForVoucherDetail = async (code: string) => {
+	const response = await axios.get(
+		`product/variation-invoice-with-code?code=${code || ""}`,
+		{
+			headers: authJsonHeader(),
+		}
+	);
+	return response.data._data;
+};
+
+export const useGetProductVariationForVoucherDetail = (code: string) =>
+	useQuery<any>({
+		queryKey: [`product-variation-size-voucher-with-code`],
+		queryFn: () => getProductVariationForVoucherDetail(code),
+		placeholderData: keepPreviousData,
+	});
+
 const createInvoice = async (payload: createInvoicePayload) => {
 	const response = await axios.post(
 		"invoice",

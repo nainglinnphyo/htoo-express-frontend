@@ -90,6 +90,7 @@ function InvoicePreview() {
 								displayValue={false}
 								fontSize={10}
 							/>
+							<span className=" mb-1" style={{ fontSize: '8px' }}>{c.code}</span>
 							<span className=" mb-1" style={{ fontSize: '8px' }}>{c.category}</span>
 						</div>
 					</div>

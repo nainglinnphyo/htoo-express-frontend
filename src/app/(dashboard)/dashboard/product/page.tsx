@@ -4,13 +4,16 @@ import { PageContainer } from "@/components/PageContainer/PageContainer";
 import { ProductCreateModel } from "@/components/Product/ProductModel";
 import { ProductTable } from "@/components/Table/ProductTable";
 import useAuthStore from "@/store/authStore";
-import { Button } from "@mantine/core";
+import { Button, Group } from "@mantine/core";
 import { useDisclosure } from '@mantine/hooks';
+import { IconPlus, IconSearch } from "@tabler/icons-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function ProductPage() {
 	const [opened, { open, close }] = useDisclosure(false);
 	const { user } = useAuthStore()
+	const router = useRouter()
 	const [productPermissions, setProductPermissions] = useState<string[]>([])
 
 	useEffect(() => {
@@ -28,7 +31,14 @@ export default function ProductPage() {
 	return (
 		<PageContainer title="Product">
 			<ProductCreateModel opened={opened} close={close} />
-			<Button onClick={open}>Create New Product</Button>
+			<Group gap={10}>
+				<Button leftSection={<IconPlus size={16} />} onClick={open}>
+					Create New Product
+				</Button>
+				<Button leftSection={<IconSearch size={16} />} onClick={() => router.push("product/search")}>
+					Search Variation
+				</Button>
+			</Group>
 			<ProductTable />
 		</PageContainer>
 	);
