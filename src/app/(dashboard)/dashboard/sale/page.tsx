@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { useForm, Controller } from "react-hook-form"
+import { useForm, Controller, set } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import {
@@ -76,6 +76,7 @@ export default function SaleVoucherPage() {
 	const [discountValue, setDiscountValue] = useState(0)
 	const [discountAmount, setDiscountAmount] = useState(0)
 	const [scanText, setScanText] = useState("")
+	const [text, setText] = useState("")
 
 	const inputRef = useRef<HTMLInputElement>(null)
 
@@ -290,11 +291,12 @@ export default function SaleVoucherPage() {
 	const total = subtotal - discountAmount + taxAmount
 
 	const handleScan = (text: string) => {
-		setScanText(text)
-		setSearchQuery(text)
+		setText(text)
+		if (text.length > 6) {
+			setScanText(text)
+			setSearchQuery(text)
+		}
 	}
-
-	console.log(scanText)
 
 	return (
 		<AnimatedPageTransition>
@@ -307,13 +309,13 @@ export default function SaleVoucherPage() {
 						<TextInput
 							leftSection={<IconSearch style={{ width: 18, height: 18 }} />}
 							placeholder="Scan Here"
-							value={scanText}
+							value={text}
 							ref={inputRef}
 							onChange={(e) => handleScan(e.target.value)}
 							onKeyDown={(e) => {
 								if (e.key === "Enter") {
-									handleScan(scanText)
-									setScanText("")
+									handleScan(text)
+									setText("")
 								}
 							}}
 							style={{ flexGrow: 1 }}

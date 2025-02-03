@@ -67,7 +67,7 @@ function InvoicePreview() {
 
 				{cartItem.map((c, index) => (
 
-					<div style={{ justifyItems: "center", marginTop: index >= 0 && index <= 2 ? 10 : index > 2 && index <= 5 ? 12 : index > 14 && index <= 17 ? 16 : index > 17 && index <= 20 ? 18 : 14, marginBottom: 18 }}>
+					<div style={{ justifyItems: "center", marginBottom: 10, marginTop: index >= 9 && index <= 11 ? 14 : index >= 12 && index <= 14 ? 16 : index >= 15 && index <= 18 ? 18 : index >= 19 && index <= 21 ? 17 : 0 }}>
 
 						<div
 							key={index}
@@ -84,7 +84,7 @@ function InvoicePreview() {
 							</div>
 							<Barcode
 								value={c.code}
-								width={0.7}
+								width={0.9}
 								height={24}
 								margin={0}
 								displayValue={false}
