@@ -11,7 +11,6 @@ import { StockAdjust } from "../Product/StockAdjustModel";
 import { VariationEditModel } from "../Product/VariationEditModel";
 import useAuthStore from "@/store/authStore";
 import { BarcodeModel } from "../Product/BarcodeModel";
-import { CartDrawer } from "../CardDrawer";
 import { useCartStore } from "@/store/barcodeStore";
 
 export function VariationDetailsTable({ product, isProductLoading, sizeId }: { product?: Product, isProductLoading: boolean, sizeId: string }) {
@@ -178,7 +177,7 @@ export function VariationDetailsTable({ product, isProductLoading, sizeId }: { p
 		const code = row.code;
 		const price = row.sellingPrice;
 		const quantity = row.quantity;
-		const category = `${row.product.subCategory.name} / ${row.product.brand.name}`
+		const category = `${row.product.subCategory.name} / ${row.product.brand.name} / ${row.size.name}`
 		addItem({
 			code,
 			price, quantity, category
@@ -189,7 +188,6 @@ export function VariationDetailsTable({ product, isProductLoading, sizeId }: { p
 			quantity,
 			category
 		}))
-		console.log(JSON.parse(JSON.stringify(localStorage.getItem('barCodeItem'))))
 	};
 	const table = useMantineReactTable({
 		columns,

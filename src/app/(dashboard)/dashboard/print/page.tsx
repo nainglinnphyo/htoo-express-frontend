@@ -19,7 +19,7 @@ import { FormattedNumber } from '@/components/Text/NumberFormatter'
 function InvoicePreview() {
 	const [cartItem, setCartItem] = useState<{ code: string, price: number, category: string }[]>([])
 	const { items } = useCartStore()
-	console.log({ items })
+
 	const handlePrint = () => {
 		window.print()
 	}
